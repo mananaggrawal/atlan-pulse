@@ -2,10 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { scan, shareableStats } from '../src/index.js';
+import { scan, breakdowns, recommendations } from '../src/index.js';
 import { renderHTML } from '../src/render/html.js';
-import { renderCardSVG, cardStats } from '../src/render/card.js';
-import { sharePost } from '../src/render/terminal.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const SKILLS = path.join(here, 'fixtures', 'skills');
@@ -112,49 +110,90 @@ test('a check that throws degrades to a note instead of killing the run', async 
   assert.equal(typeof broken.run, 'function');
 });
 
-// -- the share boundary ------------------------------------------------------
+// -- rollups and the report -------------------------------------------------
 
-test('shareable stats carry no names, paths or content', () => {
+test('breakdowns roll up by source, owner and usage', () => {
   const report = fixtureScan();
-  const stats = shareableStats(report);
-  const serialised = JSON.stringify(stats);
-  for (const name of report.skills.map((s) => s.name)) {
-    assert.ok(!serialised.includes(name), `"${name}" must not appear in shareable stats`);
-  }
-  assert.ok(!serialised.includes('/'), 'no paths');
-  assert.deepEqual(
-    Object.keys(stats).sort(),
-    ['duplicatePairs', 'estTokens', 'neverInvoked', 'neverInvokedShareOfContext', 'pctOfBudget', 'skills', 'topShare', 'windowDays'],
-  );
+  const r = breakdowns(report);
+
+  assert.equal(r.bySource.length, 1);
+  assert.equal(r.bySource[0].count, 6);
+  assert.equal(r.bySource[0].invocations, 6);
+  assert.equal(r.bySource[0].unused, 2);
+
+  assert.equal(r.leaderboard[0].name, 'pdf-export');
+  assert.equal(r.leaderboard[0].rank, 1);
+  assert.equal(r.leaderboard[0].share, 50, 'three of six invocations');
+  assert.ok(r.leaderboard.every((x) => x.invocations > 0), 'leaderboard excludes unused skills');
+
+  assert.deepEqual(r.unused.map((u) => u.name).sort(), ['never-used', 'pdf-exporter']);
+  assert.ok(r.owners.some((o) => o.owner === 'manan'));
+  assert.ok(r.owners.some((o) => o.owner === null), 'the ownerless skill is counted');
+  assert.ok(r.busFactor > 0);
 });
 
-test('the card SVG and the suggested post leak nothing either', () => {
+test('recommendations are generated from findings, never invented', () => {
   const report = fixtureScan();
-  const stats = shareableStats(report);
-  const svg = renderCardSVG(stats);
-  const post = sharePost(stats);
-  for (const skill of report.skills) {
-    assert.ok(!svg.includes(skill.name), `card leaked ${skill.name}`);
-    assert.ok(!post.includes(skill.name), `post leaked ${skill.name}`);
-    assert.ok(!svg.includes(skill.path), 'card leaked a path');
-  }
-  assert.match(svg, /^<svg/);
-  assert.match(post, /npx atlan-pulse/);
-  assert.ok(cardStats(stats).length <= 4);
+  const recs = recommendations(report, breakdowns(report));
+  const actions = recs.map((r) => r.action).join(' | ');
+
+  assert.match(actions, /Archive or delete 2 never-invoked skills/);
+  assert.match(actions, /Reconcile 1 likely-duplicate pair/);
+  assert.match(actions, /broad permissions/);
+  assert.match(actions, /Trim 1 oversized description/);
+  assert.match(actions, /Add an owner to 1 skill/);
+  assert.ok(recs.every((r) => r.why && r.effort), 'every action explains itself');
 });
 
-test('the HTML report renders and escapes user content', () => {
+test('with nothing wrong, nothing is recommended', () => {
   const report = fixtureScan();
-  const html = renderHTML(report, shareableStats(report));
+  report.findings = [];
+  report.totals.ownerless = 0;
+  const recs = recommendations(report, { unused: [], leaderboard: [] });
+  assert.deepEqual(recs, []);
+});
+
+test('the report renders every chapter and carries the Pulse identity', () => {
+  const report = fixtureScan();
+  const html = renderHTML(report, breakdowns(report), recommendations(report, breakdowns(report)));
+
   assert.match(html, /<!doctype html>/i);
-  assert.match(html, /Atlan Pulse/);
+  assert.match(html, /Atlan <b>Pulse<\/b>/, 'wordmark lockup present');
+  assert.match(html, /<svg class="mark"/, 'mark present');
+  assert.match(html, /Key takeaways/);
+  for (const id of ['cost', 'usage', 'attention', 'inventory', 'actions', 'method']) {
+    assert.ok(html.includes(`id="${id}"`), `chapter ${id} missing`);
+    assert.ok(html.includes(`href="#${id}"`), `contents entry for ${id} missing`);
+  }
+  assert.match(html, /@media print/, 'print stylesheet present');
   assert.match(html, /not affiliated with, endorsed by, or operated by Atlan/);
-  assert.ok(html.includes('pdf-export'), 'the private report does name skills');
+  assert.match(html, /npx atlan-pulse/);
 
-  const hostile = fixtureScan();
-  hostile.skills[0].name = '<img src=x onerror=alert(1)>';
-  hostile.findings = [{ id: 'x', title: 'T', severity: 'high', headline: '<script>bad()</script>', items: [{ name: '<b>x</b>', note: '"q"' }] }];
-  const escaped = renderHTML(hostile, shareableStats(hostile));
-  assert.ok(!escaped.includes('<script>bad()</script>'), 'headline must be escaped');
-  assert.ok(escaped.includes('&lt;script&gt;'), 'and present in escaped form');
+  // the full inventory lists every skill, not just the flagged ones
+  for (const skill of report.skills) assert.ok(html.includes(skill.name), `${skill.name} missing from report`);
+
+  // no leftovers from the removed sharing workflow
+  assert.ok(!html.includes('<canvas'), 'canvas removed');
+  assert.ok(!html.includes('Download PNG'), 'PNG export removed');
+  assert.ok(!/<script/.test(html), 'the report carries no scripts at all');
+});
+
+test('the report escapes hostile content from skill files', () => {
+  const report = fixtureScan();
+  report.findings = [
+    { id: 'x', title: 'T', severity: 'high', headline: '<script>bad()</script>', items: [{ name: '<b>x</b>', note: '"q"' }] },
+  ];
+  report.skills[0].name = '<img src=x onerror=alert(1)>';
+  const html = renderHTML(report, breakdowns(report), []);
+  assert.ok(!html.includes('<script>bad()</script>'), 'headline must be escaped');
+  assert.ok(!html.includes('<img src=x onerror'), 'skill name must be escaped');
+  assert.ok(html.includes('&lt;script&gt;'));
+});
+
+test('a report with no usage data still renders, and says so', () => {
+  const report = fixtureScan({ transcriptDir: path.join(here, 'fixtures', 'nope') });
+  const html = renderHTML(report, breakdowns(report), recommendations(report, breakdowns(report)));
+  assert.match(html, /Usage data unavailable/);
+  assert.match(html, /unavailable</, 'the byline reports it too');
+  assert.ok(html.includes('id="inventory"'), 'other chapters still render');
 });

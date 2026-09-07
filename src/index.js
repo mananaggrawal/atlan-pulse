@@ -70,17 +70,127 @@ export function scan(options = {}) {
   };
 }
 
-/** The aggregate-only numbers that are safe to publish. No names, no content. */
-export function shareableStats(report) {
+/**
+ * Derived rollups the report leans on. Kept here rather than in the renderer
+ * so --json carries the same numbers a reader sees on the page.
+ */
+export function breakdowns(report) {
+  const { skills, hasInvocationData } = report;
+
+  const bySource = [];
+  for (const skill of skills) {
+    let row = bySource.find((r) => r.label === skill.sourceLabel);
+    if (!row) {
+      row = { label: skill.sourceLabel, source: skill.source, count: 0, chars: 0, invocations: 0, unused: 0 };
+      bySource.push(row);
+    }
+    row.count += 1;
+    row.chars += skill.descriptionChars;
+    row.invocations += skill.invocations || 0;
+    if (hasInvocationData && skill.invocations === 0) row.unused += 1;
+  }
+  bySource.sort((a, b) => b.count - a.count);
+
+  const total = report.totals.totalInvocations;
+  const leaderboard = [...skills]
+    .filter((s) => (s.invocations || 0) > 0)
+    .sort((a, b) => b.invocations - a.invocations)
+    .map((s, i) => ({
+      rank: i + 1,
+      name: s.name,
+      invocations: s.invocations,
+      share: total ? Math.round((s.invocations / total) * 1000) / 10 : 0,
+      lastInvokedAt: s.lastInvokedAt,
+      daysSinceModified: s.daysSinceModified,
+      owner: s.owner,
+      sourceLabel: s.sourceLabel,
+    }));
+
+  const unused = skills
+    .filter((s) => hasInvocationData && s.invocations === 0)
+    .sort((a, b) => b.descriptionChars - a.descriptionChars)
+    .map((s) => ({
+      name: s.name,
+      descriptionChars: s.descriptionChars,
+      daysSinceModified: s.daysSinceModified,
+      owner: s.owner,
+      sourceLabel: s.sourceLabel,
+    }));
+
+  const owners = [];
+  for (const skill of skills) {
+    const key = skill.owner || null;
+    let row = owners.find((o) => o.owner === key);
+    if (!row) { row = { owner: key, count: 0, invocations: 0 }; owners.push(row); }
+    row.count += 1;
+    row.invocations += skill.invocations || 0;
+  }
+  owners.sort((a, b) => b.count - a.count);
+
+  const busFactor = owners.length
+    ? Math.round((Math.max(...owners.filter((o) => o.owner).map((o) => o.count), 0) / skills.length) * 100)
+    : 0;
+
+  return { bySource, leaderboard, unused, owners, busFactor };
+}
+
+/**
+ * The concrete "do this" list. Generated from findings rather than written,
+ * so it can never disagree with the numbers above it.
+ */
+export function recommendations(report, rolled) {
+  const out = [];
   const t = report.totals;
-  return {
-    skills: t.skills,
-    neverInvoked: t.neverInvoked,
-    topShare: t.topShare,
-    pctOfBudget: t.pctOfBudget,
-    neverInvokedShareOfContext: t.neverInvokedShareOfContext,
-    duplicatePairs: t.duplicatePairs,
-    estTokens: t.estTokens,
-    windowDays: report.options.windowDays,
-  };
+
+  if (rolled.unused.length) {
+    const chars = rolled.unused.reduce((n, s) => n + s.descriptionChars, 0);
+    out.push({
+      action: `Archive or delete ${rolled.unused.length} never-invoked skill${rolled.unused.length === 1 ? '' : 's'}`,
+      why: `Reclaims roughly ${estimateTokens(chars).toLocaleString()} tokens on every request. Nothing calls them today.`,
+      effort: 'minutes',
+    });
+  }
+  const dupes = report.findings.find((f) => f.id === 'near-duplicate');
+  if (dupes?.items?.length) {
+    out.push({
+      action: `Reconcile ${dupes.items.length} likely-duplicate pair${dupes.items.length === 1 ? '' : 's'}`,
+      why: 'Two skills describing the same job make the model choose, and it will not always choose the one you meant.',
+      effort: 'an hour',
+    });
+  }
+  const risky = report.findings.find((f) => f.id === 'risky-permissions');
+  if (risky?.items?.length) {
+    out.push({
+      action: `Read ${risky.items.length} skill${risky.items.length === 1 ? ' that declares' : 's that declare'} broad permissions before sharing`,
+      why: 'These can run commands, reach the network, or delete things. Anyone you send them to inherits that.',
+      effort: 'minutes',
+    });
+  }
+  const over = report.findings.find((f) => f.id === 'oversized-description');
+  if (over?.items?.length) {
+    out.push({
+      action: `Trim ${over.items.length} oversized description${over.items.length === 1 ? '' : 's'}`,
+      why: 'Past the listing limit the text risks truncation, and the description is what the model reads when deciding to use a skill at all.',
+      effort: 'minutes',
+    });
+  }
+  if (t.ownerless) {
+    out.push({
+      action: `Add an owner to ${t.ownerless} skill${t.ownerless === 1 ? '' : 's'}`,
+      why: 'Cosmetic on one laptop. The moment a second person depends on one of these, it decides who fixes it.',
+      effort: 'minutes',
+    });
+  }
+  if (rolled.leaderboard.length) {
+    const top = rolled.leaderboard.slice(0, 3);
+    const drifting = top.filter((s) => s.daysSinceModified > report.options.staleDays);
+    if (drifting.length) {
+      out.push({
+        action: `Review your ${drifting.length} most-used skill${drifting.length === 1 ? '' : 's'} for drift`,
+        why: `Heavily invoked and untouched for over ${report.options.staleDays} days is where quietly-wrong instructions live.`,
+        effort: 'an hour',
+      });
+    }
+  }
+  return out;
 }

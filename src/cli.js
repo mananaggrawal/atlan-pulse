@@ -2,10 +2,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import { scan, shareableStats, VERSION } from './index.js';
-import { renderTerminal, sharePost, c } from './render/terminal.js';
+import { scan, breakdowns, recommendations, VERSION } from './index.js';
+import { renderTerminal, c } from './render/terminal.js';
 import { renderHTML } from './render/html.js';
-import { renderCardSVG } from './render/card.js';
 import { runPack } from './commands/pack.js';
 import { runInstall } from './commands/install.js';
 import { DEFAULTS } from './lib/constants.js';
@@ -26,7 +25,6 @@ const HELP = `
     --stale-days <n>      staleness threshold, default ${DEFAULTS.STALE_DAYS}
     --out <path>          report path, default ./atlan-pulse-report.html
     --json                print the raw report model instead
-    --no-card             skip writing the share card
     --debug-transcripts   show what was found in the transcripts and stop
 
   ${c.bold('PACK')}
@@ -49,7 +47,6 @@ const OPTIONS = {
   'stale-days': { type: 'string' },
   out: { type: 'string' },
   json: { type: 'boolean', default: false },
-  'no-card': { type: 'boolean', default: false },
   'debug-transcripts': { type: 'boolean', default: false },
   top: { type: 'string' },
   only: { type: 'string' },
@@ -140,37 +137,29 @@ async function main() {
 
   if (v['debug-transcripts']) { debugTranscripts(report); return 0; }
 
-  const stats = shareableStats(report);
-  report.sharePost = sharePost(stats);
+  const rolled = breakdowns(report);
+  const recs = recommendations(report, rolled);
 
   if (v.json) {
     const { skills, ...rest } = report;
-    console.log(JSON.stringify({ ...rest, skills: skills.map(({ frontmatter, ...s }) => s) }, null, 2));
+    console.log(
+      JSON.stringify(
+        { ...rest, skills: skills.map(({ frontmatter, ...s }) => s), breakdowns: rolled, recommendations: recs },
+        null,
+        2,
+      ),
+    );
     return 0;
   }
 
   let reportPath = null;
-  let cardPath = null;
-
   if (report.totals.skills) {
     reportPath = path.resolve(v.out || 'atlan-pulse-report.html');
     fs.mkdirSync(path.dirname(reportPath), { recursive: true });
-    fs.writeFileSync(reportPath, renderHTML(report, stats));
-
-    if (!v['no-card']) {
-      cardPath = reportPath.replace(/\.html?$/i, '') + '-card.svg';
-      fs.writeFileSync(cardPath, renderCardSVG(stats));
-    }
+    fs.writeFileSync(reportPath, renderHTML(report, rolled, recs));
   }
 
-  console.log(renderTerminal(report, { reportPath, cardPath }));
-
-  if (reportPath) {
-    console.log(c.dim('  Suggested post (aggregate numbers only):'));
-    console.log('');
-    for (const line of report.sharePost.split('\n')) console.log(`     ${c.ink(line)}`);
-    console.log('');
-  }
+  console.log(renderTerminal(report, { reportPath, recs }));
   return 0;
 }
 

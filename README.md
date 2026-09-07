@@ -6,10 +6,10 @@
 npx atlan-pulse
 ```
 
-You get a terminal summary and a standalone HTML report:
+You get a terminal summary and a standalone, shareable HTML report:
 
-> You have 47 skills. 12 of them have never run.
-> Your skill listing costs about 4,100 tokens on every request — 205% of its budget — and 38% of that is skills you have never invoked.
+> **47 skills installed. 12 of them have never run.**
+> Your skill descriptions cost an estimated 4,100 tokens on every request — 205% of the budget the listing is allotted — and 38% of that is skills you have never invoked.
 
 ---
 
@@ -36,16 +36,29 @@ Pulse reads what is already on your machine and tells you which skills are earni
 
 Five of the eight need no history at all and work on a machine you installed this morning. The three invocation-based ones read your local session transcripts.
 
-## Share what you found
+## The report
+
+The report is the point of the tool. It is a single self-contained HTML file, written to your working directory, with no scripts in it and no network calls beyond webfonts — so it can be dropped in Slack, attached to an email, committed next to your skills, opened on a phone, or printed to PDF with Cmd-P and still be itself.
+
+It opens with the headline number and a key-takeaways summary, then runs six numbered chapters:
+
+1. **The context tax** — what your skills cost before anyone types a prompt, and how much of it is spent on skills that never run
+2. **What you actually use** — a usage leaderboard with each skill's share, and the full never-invoked list
+3. **What needs attention** — every finding, with the skills behind it
+4. **Inventory** — a breakdown by location and owner, then every skill found
+5. **Recommended actions** — the specific list, ordered by payoff, generated from the findings rather than written
+6. **Method and limits** — every location searched, every constant used, and what the tool cannot see
+
+Nothing in it is hidden or hand-waved: the constants that produce each number are printed in chapter 6, next to where they came from.
+
+## Send it to someone
 
 ```bash
 npx atlan-pulse pack                        # bundle your best skills
 npx atlan-pulse install <url-to-bundle>     # what your teammate runs
 ```
 
-`pack` takes the skills you actually use, writes them to a single JSON file, and prints one line to send someone. Ranking is by real invocation count, so you are sending a colleague the skills that earn their keep — not a folder dump.
-
-The HTML report also contains a share card built from **aggregate numbers only**: counts and percentages, never a skill name, description or file path. Download it as a PNG and post it if you like. The report itself, which does name your skills, stays on your disk.
+`pack` takes the skills you actually use, writes them to a single JSON file, and prints one line to send someone. Ranking is by real invocation count, so a colleague gets the skills that earn their keep — not a folder dump.
 
 ### `install` is deliberately boring
 
@@ -61,7 +74,6 @@ npx atlan-pulse
   --stale-days <n>      staleness threshold, default 180
   --out <path>          report path, default ./atlan-pulse-report.html
   --json                print the report model instead of writing HTML
-  --no-card             skip the share card
   --debug-transcripts   show what was found in the transcripts, then stop
 ```
 

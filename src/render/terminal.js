@@ -30,7 +30,7 @@ const wrap = (text, width = 76, indent = '     ') =>
     .map((l) => indent + l)
     .join('\n');
 
-export function renderTerminal(report, { reportPath, cardPath } = {}) {
+export function renderTerminal(report, { reportPath, recs } = {}) {
   const out = [];
   const t = report.totals;
 
@@ -75,26 +75,20 @@ export function renderTerminal(report, { reportPath, cardPath } = {}) {
     out.push('');
   }
 
-  if (reportPath) out.push(`  ${c.blue('→')} Full report  ${c.bold(reportPath)}`);
-  if (cardPath) out.push(`  ${c.blue('→')} Share card   ${c.bold(cardPath)}`);
-  out.push('');
-  out.push(c.dim('  The report stays on this machine. Nothing was uploaded.'));
+  if (recs?.length) {
+    out.push(`  ${c.bold('What to do about it')}`);
+    recs.slice(0, 4).forEach((r, i) => {
+      out.push(`     ${c.blue(String(i + 1))}. ${r.action}${c.dim(`  · ${r.effort}`)}`);
+    });
+    out.push('');
+  }
+
+  if (reportPath) {
+    out.push(`  ${c.blue('→')} Full report  ${c.bold(reportPath)}`);
+    out.push('');
+    out.push(c.dim('  Open it, or print to PDF, and send it to whoever owns these skills.'));
+    out.push(c.dim('  It stays on this machine. Nothing was uploaded.'));
+  }
   out.push('');
   return out.join('\n');
-}
-
-/** A post the user can paste. Aggregate numbers only — never skill names. */
-export function sharePost(stats) {
-  const bits = [`I scanned my ${stats.skills} Claude Code skills.`];
-  if (stats.neverInvoked !== null && stats.neverInvoked > 0) {
-    bits.push(`${stats.neverInvoked} have never been invoked.`);
-  }
-  if (stats.topShare !== null) bits.push(`3 of them account for ${stats.topShare}% of all my invocations.`);
-  if (stats.neverInvokedShareOfContext) {
-    bits.push(`The dead ones eat ${stats.neverInvokedShareOfContext}% of my skill-listing context budget.`);
-  } else {
-    bits.push(`They cost ~${stats.estTokens.toLocaleString()} tokens of context on every single request.`);
-  }
-  bits.push('\nCheck yours:  npx atlan-pulse');
-  return bits.join(' ');
 }
