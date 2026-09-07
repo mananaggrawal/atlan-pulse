@@ -48,14 +48,15 @@ Five of the eight need no history at all and work on a machine you installed thi
 
 The report is the point of the tool. It is a single self-contained HTML file, written to your working directory, with no scripts in it and no network calls beyond webfonts — so it can be dropped in Slack, attached to an email, committed next to your skills, opened on a phone, or printed to PDF with Cmd-P and still be itself.
 
-It opens with the headline number and a key-takeaways summary, then runs six numbered chapters:
+It opens with the headline number and a key-takeaways summary, then runs five numbered chapters:
 
 1. **The context tax** — what your skills cost before anyone types a prompt, and how much of it is spent on skills that never run
 2. **What you actually use** — a usage leaderboard with each skill's share, and the full never-invoked list
 3. **What needs attention** — every finding, with the skills behind it
 4. **Inventory** — a breakdown by location and owner, then every skill found
-5. **Recommended actions** — the specific list, ordered by payoff, generated from the findings rather than written
-6. **Method and limits** — every location searched, every constant used, and what the tool cannot see
+5. **Method and limits** — every location searched, every constant used, and what the tool cannot see
+
+Pulse reports what it observed — it does not tell you what to do about it.
 
 Nothing in it is hidden or hand-waved: the constants that produce each number are printed in chapter 6, next to where they came from.
 

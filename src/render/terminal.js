@@ -30,7 +30,7 @@ const wrap = (text, width = 76, indent = '     ') =>
     .map((l) => indent + l)
     .join('\n');
 
-export function renderTerminal(report, { reportPath, cardPath, recs } = {}) {
+export function renderTerminal(report, { reportPath, cardPath } = {}) {
   const out = [];
   const t = report.totals;
 
@@ -45,6 +45,11 @@ export function renderTerminal(report, { reportPath, cardPath, recs } = {}) {
     for (const r of report.roots) out.push(c.muted(`    ${r.found ? '·' : '✗'} ${r.label}`));
     out.push('');
     out.push(c.muted('  Point it somewhere else with --dir <path>.'));
+    out.push('');
+    out.push(c.muted('  On the Claude desktop app? Skills live in your account, not as files —'));
+    out.push(c.muted('  this only reads skills on disk (Claude Code / Codex CLI, or a repo you'));
+    out.push(c.muted('  point it at with --dir). Try it against a skills repo or a teammate on'));
+    out.push(c.muted('  the CLI to see a real report.'));
     out.push('');
     return out.join('\n');
   }
@@ -72,14 +77,6 @@ export function renderTerminal(report, { reportPath, cardPath, recs } = {}) {
         out.push(c.dim(`       …and ${f.items.length - shown.length} more in the report`));
       }
     }
-    out.push('');
-  }
-
-  if (recs?.length) {
-    out.push(`  ${c.bold('What to do about it')}`);
-    recs.slice(0, 4).forEach((r, i) => {
-      out.push(`     ${c.blue(String(i + 1))}. ${r.action}${c.dim(`  · ${r.effort}`)}`);
-    });
     out.push('');
   }
 

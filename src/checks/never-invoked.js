@@ -22,7 +22,7 @@ export default {
     return {
       severity: pct >= 40 ? 'high' : 'medium',
       headline: `${dead.length} of ${skills.length} skills (${pct}%) were never invoked in the last ${options.windowDays} days.`,
-      detail: 'Each one still costs context on every request. These are the first candidates to archive.',
+      detail: 'Each one still costs context on every request.',
       items: dead
         .sort((a, b) => b.descriptionChars - a.descriptionChars)
         .map((s) => ({ name: s.name, note: `${s.descriptionChars} chars of description`, path: s.relPath })),

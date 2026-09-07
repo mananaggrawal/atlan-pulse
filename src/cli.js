@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import { scan, breakdowns, recommendations, VERSION } from './index.js';
+import { scan, breakdowns, VERSION } from './index.js';
 import { renderTerminal, c } from './render/terminal.js';
 import { renderHTML } from './render/html.js';
 import { renderCard } from './render/card.js';
@@ -171,13 +171,12 @@ async function main() {
   if (v['debug-transcripts']) { debugTranscripts(report); return 0; }
 
   const rolled = breakdowns(report);
-  const recs = recommendations(report, rolled);
 
   if (v.json) {
     const { skills, ...rest } = report;
     console.log(
       JSON.stringify(
-        { ...rest, skills: skills.map(({ frontmatter, ...s }) => s), breakdowns: rolled, recommendations: recs },
+        { ...rest, skills: skills.map(({ frontmatter, ...s }) => s), breakdowns: rolled },
         null,
         2,
       ),
@@ -190,7 +189,7 @@ async function main() {
   if (report.totals.skills) {
     reportPath = path.resolve(v.out || 'atlan-pulse-report.html');
     fs.mkdirSync(path.dirname(reportPath), { recursive: true });
-    fs.writeFileSync(reportPath, renderHTML(report, rolled, recs));
+    fs.writeFileSync(reportPath, renderHTML(report, rolled));
 
     if (v.card) {
       cardPath = path.join(path.dirname(reportPath), 'atlan-pulse-card.html');
@@ -198,7 +197,7 @@ async function main() {
     }
   }
 
-  console.log(renderTerminal(report, { reportPath, cardPath, recs }));
+  console.log(renderTerminal(report, { reportPath, cardPath }));
   return 0;
 }
 

@@ -32,7 +32,7 @@ export default {
     return {
       severity: shellCount ? 'high' : 'medium',
       headline: `${plural(flagged.length, 'skill')} ${agrees(flagged.length, 'declares', 'declare')} broad permissions${shellCount ? `, ${shellCount} of them shell execution` : ''}.`,
-      detail: 'This reads declared frontmatter only. It is not a security scan and cannot see what a skill actually does — treat it as a list of files worth reading before you share them.',
+      detail: 'This reads declared frontmatter only. It is not a security scan and cannot see what a skill actually does.',
       items: flagged.map((f) => ({
         name: f.skill.name,
         note: f.reasons.join(', '),

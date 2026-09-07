@@ -54,7 +54,7 @@ function takeaways(report, rolled) {
     }
     if (t.topShare !== null && rolled.leaderboard.length) {
       out.push(
-        `Just <strong>three skills</strong> account for ${pct(t.topShare)} of your ${n(t.totalInvocations)} invocations — those are the ones worth maintaining, and the ones a teammate would benefit from most.`,
+        `Just <strong>three skills</strong> account for ${pct(t.topShare)} of your ${n(t.totalInvocations)} invocations.`,
       );
     }
   } else {
@@ -68,10 +68,10 @@ function takeaways(report, rolled) {
   }
   const risky = report.findings.find((f) => f.id === 'risky-permissions');
   if (risky?.items?.length) {
-    out.push(`<strong>${risky.items.length} skill${risky.items.length === 1 ? '' : 's'}</strong> ${risky.items.length === 1 ? 'declares' : 'declare'} broad permissions — shell, network or deletion — and should be read before being shared.`);
+    out.push(`<strong>${risky.items.length} skill${risky.items.length === 1 ? '' : 's'}</strong> ${risky.items.length === 1 ? 'declares' : 'declare'} broad permissions — shell, network or deletion.`);
   }
   if (t.ownerless) {
-    out.push(`<strong>${t.ownerless} of ${t.skills}</strong> ${t.ownerless === 1 ? 'declares' : 'declare'} no owner, which decides nothing today and decides everything the moment a second person depends on one.`);
+    out.push(`<strong>${t.ownerless} of ${t.skills}</strong> ${t.ownerless === 1 ? 'declares' : 'declare'} no owner in frontmatter.`);
   }
   return out;
 }
@@ -180,7 +180,7 @@ function chapterUsage(report, rolled) {
 
   return `${board}
     <h3 class="sub">Never invoked in ${report.options.windowDays} days</h3>
-    <p class="f-detail">These cost context on every request and return nothing. They are the cheapest thing on this page to fix.</p>
+    <p class="f-detail">These have zero recorded invocations in the window, and still cost context on every request.</p>
     ${unused}`;
 }
 
@@ -223,18 +223,6 @@ function chapterInventory(report, rolled) {
     ${owners}
     <h3 class="sub">Full inventory</h3>
     ${all}`;
-}
-
-function chapterActions(recs) {
-  if (!recs.length) return '<p class="empty">Nothing to do. Unusual, and worth a screenshot.</p>';
-  return `<ol class="actions">${recs
-    .map(
-      (r) => `<li>
-        <div class="a-head"><span class="a-title">${esc(r.action)}</span><span class="a-effort">${esc(r.effort)}</span></div>
-        <p class="a-why">${esc(r.why)}</p>
-      </li>`,
-    )
-    .join('')}</ol>`;
 }
 
 function chapterMethod(report) {
@@ -293,7 +281,7 @@ function chapterMethod(report) {
 
 // ---------------------------------------------------------------------------
 
-export function renderHTML(report, rolled, recs) {
+export function renderHTML(report, rolled) {
   const logo = resolveLogo(report.options.logo);
   const h = headline(report);
   const t = report.totals;
@@ -304,7 +292,6 @@ export function renderHTML(report, rolled, recs) {
     { id: 'usage', title: 'What you actually use', blurb: 'Which skills earn their place, and which never run.' },
     { id: 'attention', title: 'What needs attention', blurb: 'Duplicates, permissions, drift and ownership.' },
     { id: 'inventory', title: 'Inventory', blurb: 'Everything found, where it lives, and who owns it.' },
-    { id: 'actions', title: 'Recommended actions', blurb: 'The specific list, in order of payoff.' },
     { id: 'method', title: 'Method and limits', blurb: 'Where the numbers come from, and what they cannot tell you.' },
   ];
 
@@ -322,7 +309,6 @@ export function renderHTML(report, rolled, recs) {
     usage: chapterUsage(report, rolled),
     attention: chapterFindings(report),
     inventory: chapterInventory(report, rolled),
-    actions: chapterActions(recs),
     method: chapterMethod(report),
   };
 
@@ -445,14 +431,6 @@ td.share{white-space:nowrap}
 .track i{display:block;height:100%;background:var(--blue);border-radius:3px}
 .finding table{margin-top:16px;border-top:1px solid var(--line);padding-top:4px}
 
-/* actions */
-.actions{list-style:none;counter-reset:a;margin:0;padding:0}
-.actions li{counter-increment:a;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px 22px 18px 56px;margin-bottom:10px;position:relative}
-.actions li::before{content:counter(a);position:absolute;left:22px;top:18px;font-family:var(--mono);font-size:12px;color:var(--blue)}
-.a-head{display:flex;justify-content:space-between;align-items:baseline;gap:14px}
-.a-title{font-family:var(--display);font-weight:600;font-size:16px;color:var(--ink-strong)}
-.a-effort{font-size:11px;color:var(--muted);letter-spacing:.04em;white-space:nowrap;border:1px solid var(--line);border-radius:20px;padding:2px 9px}
-.a-why{margin:7px 0 0;font-size:13.5px;color:var(--muted);max-width:76ch}
 
 .limits{margin:14px 0 0;padding-left:20px;font-size:13.5px;color:var(--muted);max-width:78ch}
 .limits li{margin-bottom:7px}
@@ -482,7 +460,7 @@ footer .cta{font-family:var(--mono);color:var(--blue);font-size:13px}
   .chapter{margin-bottom:26px;page-break-inside:auto}
   .chapter-head{page-break-after:avoid;page-break-inside:avoid}
   h2,h3{page-break-after:avoid}
-  .takeaways,.finding,.panel,.actions li,.stats{page-break-inside:avoid;box-shadow:none}
+  .takeaways,.finding,.panel,.stats{page-break-inside:avoid;box-shadow:none}
   /* Keep the contents together, but do not force a break after it — that
      left a near-empty page whenever the list did not fill one. */
   .toc{page-break-inside:avoid}

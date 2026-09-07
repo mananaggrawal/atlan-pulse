@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { scan, breakdowns, recommendations } from '../src/index.js';
+import { scan, breakdowns } from '../src/index.js';
 import { renderHTML } from '../src/render/html.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -143,30 +143,9 @@ test('breakdowns roll up by source, owner and usage', () => {
   assert.ok(r.busFactor > 0);
 });
 
-test('recommendations are generated from findings, never invented', () => {
-  const report = fixtureScan();
-  const recs = recommendations(report, breakdowns(report));
-  const actions = recs.map((r) => r.action).join(' | ');
-
-  assert.match(actions, /Archive or delete 2 never-invoked skills/);
-  assert.match(actions, /Reconcile 1 likely-duplicate pair/);
-  assert.match(actions, /broad permissions/);
-  assert.match(actions, /Trim 1 oversized description/);
-  assert.match(actions, /Add an owner to 1 skill/);
-  assert.ok(recs.every((r) => r.why && r.effort), 'every action explains itself');
-});
-
-test('with nothing wrong, nothing is recommended', () => {
-  const report = fixtureScan();
-  report.findings = [];
-  report.totals.ownerless = 0;
-  const recs = recommendations(report, { unused: [], leaderboard: [] });
-  assert.deepEqual(recs, []);
-});
-
 test('the report renders every chapter and carries the Pulse identity', () => {
   const report = fixtureScan();
-  const html = renderHTML(report, breakdowns(report), recommendations(report, breakdowns(report)));
+  const html = renderHTML(report, breakdowns(report));
 
   assert.match(html, /<!doctype html>/i);
   // Logo-agnostic: assets/logo.svg may or may not be present in a given
@@ -176,7 +155,7 @@ test('the report renders every chapter and carries the Pulse identity', () => {
   assert.match(html, /class="(mark|logo)"/, 'a mark or a supplied logo is rendered');
   assert.match(html, /Skill Health Report/, 'document type named in the masthead');
   assert.match(html, /Key takeaways/);
-  for (const id of ['cost', 'usage', 'attention', 'inventory', 'actions', 'method']) {
+  for (const id of ['cost', 'usage', 'attention', 'inventory', 'method']) {
     assert.ok(html.includes(`id="${id}"`), `chapter ${id} missing`);
     assert.ok(html.includes(`href="#${id}"`), `contents entry for ${id} missing`);
   }
@@ -201,7 +180,7 @@ test('the report escapes hostile content from skill files', () => {
     { id: 'x', title: 'T', severity: 'high', headline: '<script>bad()</script>', items: [{ name: '<b>x</b>', note: '"q"' }] },
   ];
   report.skills[0].name = '<img src=x onerror=alert(1)>';
-  const html = renderHTML(report, breakdowns(report), []);
+  const html = renderHTML(report, breakdowns(report));
   assert.ok(!html.includes('<script>bad()</script>'), 'headline must be escaped');
   assert.ok(!html.includes('<img src=x onerror'), 'skill name must be escaped');
   assert.ok(html.includes('&lt;script&gt;'));
@@ -209,7 +188,7 @@ test('the report escapes hostile content from skill files', () => {
 
 test('a report with no usage data still renders, and says so', () => {
   const report = fixtureScan({ transcriptDir: path.join(here, 'fixtures', 'nope') });
-  const html = renderHTML(report, breakdowns(report), recommendations(report, breakdowns(report)));
+  const html = renderHTML(report, breakdowns(report));
   assert.match(html, /Usage data unavailable/);
   assert.match(html, /unavailable</, 'the byline reports it too');
   assert.ok(html.includes('id="inventory"'), 'other chapters still render');

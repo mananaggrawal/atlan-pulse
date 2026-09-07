@@ -17,7 +17,7 @@ export default {
     return {
       severity: 'info',
       headline: `${top.length} skills account for ${share}% of your ${total.toLocaleString()} invocations in the last ${options.windowDays} days.`,
-      detail: 'A high number here is not a problem in itself — it tells you which skills are worth maintaining, and which of your teammates would benefit most from them.',
+      detail: 'A high number here is not a problem in itself.',
       stat: { totalInvocations: total, topShare: share },
       items: top.map((s) => ({ name: s.name, note: plural(s.invocations, 'invocation'), path: s.relPath })),
     };
