@@ -1,4 +1,4 @@
-import { test } from 'node:test';
+import { test, before } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -11,6 +11,13 @@ import { validateBundle, slugify, runInstall } from '../src/commands/install.js'
 const here = path.dirname(fileURLToPath(import.meta.url));
 const SKILLS = path.join(here, 'fixtures', 'skills');
 const PROJECTS = path.join(here, 'fixtures', 'projects');
+// See scan.test.js: mtimes do not survive a git clone.
+before(() => {
+  const stale = path.join(SKILLS, 'legacy-thing', 'SKILL.md');
+  const d = new Date('2020-01-01T00:00:00Z');
+  fs.utimesSync(stale, d, d);
+});
+
 const report = () => scan({ cwd: path.join(here, 'fixtures'), extraDirs: [SKILLS], transcriptDir: PROJECTS });
 
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'pulse-test-'));

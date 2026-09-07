@@ -1,4 +1,4 @@
-import { test } from 'node:test';
+import { test, before } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -12,6 +12,15 @@ const SKILLS = path.join(here, 'fixtures', 'skills');
 const PROJECTS = path.join(here, 'fixtures', 'projects');
 
 // An empty cwd keeps the machine's own ~/.claude out of the fixture run.
+// git does not preserve mtimes, so a fresh clone would hand every fixture
+// today's date and the staleness assertions would fail for anyone but the
+// author. Pin the one file the age checks depend on before any test runs.
+const STALE_FIXTURE = path.join(SKILLS, 'legacy-thing', 'SKILL.md');
+const STALE_DATE = new Date('2020-01-01T00:00:00Z');
+before(() => {
+  fs.utimesSync(STALE_FIXTURE, STALE_DATE, STALE_DATE);
+});
+
 const fixtureScan = (over = {}) =>
   scan({ cwd: path.join(here, 'fixtures'), extraDirs: [SKILLS], transcriptDir: PROJECTS, ...over });
 
