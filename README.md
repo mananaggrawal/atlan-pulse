@@ -10,7 +10,7 @@ Requires **Node 20 or newer** and nothing else — there are no dependencies to 
 
 You get a terminal summary and a standalone, shareable HTML report:
 
-> **47 skills installed. 12 of them have never run.**
+> **41 skills installed. 14 of them have never run.**
 > Your skill descriptions cost an estimated 4,100 tokens on every request — 205% of the budget the listing is allotted — and 38% of that is skills you have never invoked.
 
 ---
@@ -53,6 +53,16 @@ It opens with the headline number and a key-takeaways summary, then runs six num
 
 Nothing in it is hidden or hand-waved: the constants that produce each number are printed in chapter 6, next to where they came from.
 
+## Post the score, not the skills
+
+```bash
+npx atlan-pulse --card
+```
+
+Writes `atlan-pulse-card.html` next to the report. Open it, hit **Download PNG**, and you have something sized for a timeline: your skill count, your invocations, how many have never run, and the command you ran to find out.
+
+It carries numbers and nothing else — no skill names, no descriptions, no hint of what you work on. That is the point. Plenty of people who would never publish their skill library will happily publish a score, and a score gives away nothing a competitor could use. There is a test in the suite that fails if a skill name ever reaches the card.
+
 ## Send it to someone
 
 ```bash
@@ -77,6 +87,7 @@ npx atlan-pulse
   --days <n>            invocation window, default 90
   --stale-days <n>      staleness threshold, default 180
   --out <path>          report path, default ./atlan-pulse-report.html
+  --card                also write a share card you can post
   --logo <path>         logo for the report masthead (svg or png)
   --json                print the report model instead of writing HTML
   --debug-transcripts   show what was found in the transcripts, then stop

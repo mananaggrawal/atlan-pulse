@@ -30,7 +30,7 @@ const wrap = (text, width = 76, indent = '     ') =>
     .map((l) => indent + l)
     .join('\n');
 
-export function renderTerminal(report, { reportPath, recs } = {}) {
+export function renderTerminal(report, { reportPath, cardPath, recs } = {}) {
   const out = [];
   const t = report.totals;
 
@@ -88,6 +88,13 @@ export function renderTerminal(report, { reportPath, recs } = {}) {
     out.push('');
     out.push(c.dim('  Open it, or print to PDF, and send it to whoever owns these skills.'));
     out.push(c.dim('  It stays on this machine. Nothing was uploaded.'));
+  }
+
+  if (cardPath) {
+    out.push('');
+    out.push(`  ${c.blue('→')} Share card   ${c.bold(cardPath)}`);
+    out.push('');
+    out.push(c.dim('  Numbers only, no skill names. Open it and hit Download PNG.'));
   }
   out.push('');
   return out.join('\n');

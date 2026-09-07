@@ -8,8 +8,8 @@
   "exports": { ".": "./src/index.js" },
   "engines": { "node": ">=20" },
   "scripts": {
-    "test": "node --test test/",
-    "demo": "node src/cli.js --dir test/fixtures/skills --transcripts test/fixtures/projects --out /tmp/pulse-demo.html"
+    "test": "node --test test/*.test.js",
+    "demo": "node src/cli.js --dir test/fixtures/skills --transcripts test/fixtures/projects --card --out ./atlan-pulse-report.html"
   },
   "files": ["src", "assets", "README.md", "LICENSE"],
   "keywords": ["claude-code", "codex", "agent-skills", "skills", "health", "audit", "cli"],

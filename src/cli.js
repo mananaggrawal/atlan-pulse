@@ -5,6 +5,7 @@ import { parseArgs } from 'node:util';
 import { scan, breakdowns, recommendations, VERSION } from './index.js';
 import { renderTerminal, c } from './render/terminal.js';
 import { renderHTML } from './render/html.js';
+import { renderCard } from './render/card.js';
 import { runPack } from './commands/pack.js';
 import { runInstall } from './commands/install.js';
 import { DEFAULTS } from './lib/constants.js';
@@ -24,6 +25,7 @@ const HELP = `
     --days <n>            invocation window, default ${DEFAULTS.WINDOW_DAYS}
     --stale-days <n>      staleness threshold, default ${DEFAULTS.STALE_DAYS}
     --out <path>          report path, default ./atlan-pulse-report.html
+    --card                also write a share card you can post
     --logo <path>         logo for the report masthead (svg/png)
                           ${c.dim('(or drop one at assets/logo.svg)')}
     --json                print the raw report model instead
@@ -49,6 +51,7 @@ const OPTIONS = {
   'stale-days': { type: 'string' },
   out: { type: 'string' },
   logo: { type: 'string' },
+  card: { type: 'boolean', default: false },
   json: { type: 'boolean', default: false },
   'debug-transcripts': { type: 'boolean', default: false },
   top: { type: 'string' },
@@ -183,13 +186,19 @@ async function main() {
   }
 
   let reportPath = null;
+  let cardPath = null;
   if (report.totals.skills) {
     reportPath = path.resolve(v.out || 'atlan-pulse-report.html');
     fs.mkdirSync(path.dirname(reportPath), { recursive: true });
     fs.writeFileSync(reportPath, renderHTML(report, rolled, recs));
+
+    if (v.card) {
+      cardPath = path.join(path.dirname(reportPath), 'atlan-pulse-card.html');
+      fs.writeFileSync(cardPath, renderCard(report, rolled, { logo: v.logo ?? null }));
+    }
   }
 
-  console.log(renderTerminal(report, { reportPath, recs }));
+  console.log(renderTerminal(report, { reportPath, cardPath, recs }));
   return 0;
 }
 
