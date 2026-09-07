@@ -6,6 +6,8 @@
 npx atlan-pulse
 ```
 
+Requires **Node 20 or newer** and nothing else — there are no dependencies to install. Check with `node -v`; if that command is not found, install Node from [nodejs.org](https://nodejs.org) or `brew install node`.
+
 You get a terminal summary and a standalone, shareable HTML report:
 
 > **47 skills installed. 12 of them have never run.**
