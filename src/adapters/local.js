@@ -172,6 +172,12 @@ export function collectInvocations({ transcriptDir, windowDays = DEFAULTS.WINDOW
   const report = {
     dir: present.map(tilde).join(', ') || tilde(dirs[0]),
     searched: dirs.map((d) => ({ dir: tilde(d), found: exists(d) })),
+    // Every file seen in those directories, counted by extension — including
+    // the ones we did not try to parse. A directory that exists but yields
+    // nothing is otherwise indistinguishable from one that is empty.
+    seenExtensions: {},
+    skippedFiles: 0,
+    sampleSkipped: [],
     available: false,
     filesRead: 0,
     linesRead: 0,
@@ -193,10 +199,20 @@ export function collectInvocations({ transcriptDir, windowDays = DEFAULTS.WINDOW
     try { entries = fs.readdirSync(d, { withFileTypes: true }); } catch { return; }
     for (const e of entries) {
       const full = path.join(d, e.name);
-      if (e.isDirectory()) walk(full, depth + 1);
+      if (e.isDirectory()) { walk(full, depth + 1); continue; }
+      if (!e.isFile()) continue;
+
+      const ext = path.extname(e.name).toLowerCase() || '(no extension)';
+      report.seenExtensions[ext] = (report.seenExtensions[ext] || 0) + 1;
+
       // .json is here because not every harness writes line-delimited files;
       // a whole-file JSON array of events is handled below.
-      else if (e.isFile() && (e.name.endsWith('.jsonl') || e.name.endsWith('.json'))) files.push(full);
+      if (e.name.endsWith('.jsonl') || e.name.endsWith('.json')) {
+        files.push(full);
+      } else {
+        report.skippedFiles += 1;
+        if (report.sampleSkipped.length < 5) report.sampleSkipped.push(tilde(full));
+      }
     }
   };
   for (const d of present) walk(d);

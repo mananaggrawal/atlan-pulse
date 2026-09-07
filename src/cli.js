@@ -77,6 +77,23 @@ function debugTranscripts(report) {
   console.log(`     matched via     ${Object.keys(t.signatures).join(', ') || c.muted('nothing matched')}`);
   console.log('');
 
+  const exts = Object.entries(t.seenExtensions ?? {}).sort((a, b) => b[1] - a[1]);
+  if (exts.length) {
+    console.log(c.dim('  Files seen in those directories, by extension:'));
+    console.log('');
+    for (const [ext, count] of exts) console.log(`     ${String(count).padStart(7)}  ${ext}`);
+    console.log('');
+  }
+  if (t.skippedFiles) {
+    console.log(c.dim(`  ${t.skippedFiles} file(s) were not read because the extension is not .json or .jsonl:`));
+    console.log('');
+    for (const f of t.sampleSkipped ?? []) console.log(c.muted(`     ${f}`));
+    console.log('');
+    console.log(c.dim('  If those are transcripts, tell me the format and the reader can be'));
+    console.log(c.dim('  taught it — the walker is in collectInvocations, src/adapters/local.js.'));
+    console.log('');
+  }
+
   const tools = Object.entries(t.toolHistogram).sort((a, b) => b[1] - a[1]).slice(0, 25);
   if (tools.length) {
     console.log(c.dim('  Tool names seen in these transcripts (top 25):'));
