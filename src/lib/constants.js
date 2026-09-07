@@ -18,13 +18,9 @@ export const ANCHORS = {
   CHARS_PER_TOKEN: 4,
 };
 
-// How to tell someone to run this.
-//
-// Nothing is published to npm yet, so `npx atlan-pulse` resolves only inside a
-// clone and 404s for everyone else. The github: form works today. This is the
-// one place it is written down: when the package is published, change this line
-// to `npx atlan-pulse` and the report footer, the share card and the suggested
-// post all follow.
+// How to tell someone to run this. Published to npm as `atlan-pulse`, so this
+// resolves for everyone. The one place it is written down — the report footer
+// and the terminal output both read it from here.
 export const RUN_COMMAND = 'npx atlan-pulse';
 
 export const DEFAULTS = {

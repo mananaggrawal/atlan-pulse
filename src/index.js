@@ -1,11 +1,16 @@
 // Scan orchestration: adapter → engine → report model.
 // Every renderer and the --json output consume the same model.
 
+import { readFileSync } from 'node:fs';
 import { collectSkills, collectInvocations, attachInvocations } from './adapters/local.js';
 import { runChecks } from './engine.js';
 import { DEFAULTS, listingBudgetTokens, estimateTokens } from './lib/constants.js';
 
-export const VERSION = '0.1.0';
+// Single source of truth. Hardcoding this drifted once already: package.json
+// said 0.1.4 while every report footer printed v0.1.0.
+export const VERSION = JSON.parse(
+  readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+).version;
 
 export function scan(options = {}) {
   const opts = {
