@@ -1,6 +1,6 @@
 {
   "name": "atlan-pulse",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Skill health for Claude Code and Codex. Scans the agent skills already on your laptop and tells you which ones are dead weight.",
   "type": "module",
   "bin": { "atlan-pulse": "src/cli.js" },
