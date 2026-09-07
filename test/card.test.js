@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { scan, breakdowns } from '../src/index.js';
 import { cardModel, renderCard } from '../src/render/card.js';
+import { RUN_COMMAND } from '../src/lib/constants.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const SKILLS = path.join(here, 'fixtures', 'skills');
@@ -29,7 +30,7 @@ test('leads on never-run when usage is known', () => {
   const model = cardModel(report, breakdowns(report));
   assert.equal(model.lead, '6 skills installed.');
   assert.equal(model.turn, '2 of them have never run.');
-  assert.match(model.post, /npx atlan-pulse/);
+  assert.match(model.post, /npx github:[\w-]+\/atlan-pulse/, 'suggested post must carry a command that runs');
 });
 
 test('claims nothing about usage when there are no transcripts', () => {
@@ -60,7 +61,7 @@ test('renders a self-contained page carrying the command and the post', () => {
   const html = renderCard(report, breakdowns(report));
 
   assert.match(html, /<canvas/);
-  assert.match(html, /npx atlan-pulse/);
+  assert.ok(html.includes(RUN_COMMAND), 'card carries the runnable command');
   assert.doesNotMatch(html, /<script src=/, 'no third-party script tags');
 
   for (const skill of report.skills) {
@@ -74,4 +75,16 @@ test('flattens pattern fills so a logo actually rasterises on canvas', () => {
   // A <pattern> that survived into the payload would paint nothing on a canvas.
   assert.doesNotMatch(html, /\\u003cpattern/i);
   assert.doesNotMatch(html, /url\(#/);
+});
+
+// The card is the acquisition surface. A command that 404s is worse here than
+// anywhere else in the tool, because the person posting it cannot see it fail.
+test('the card and its post carry a command that actually resolves', () => {
+  const report = withUsage();
+  const model = cardModel(report, breakdowns(report));
+  const html = renderCard(report, breakdowns(report));
+
+  assert.ok(model.post.includes(RUN_COMMAND));
+  assert.ok(html.includes(RUN_COMMAND));
+  assert.doesNotMatch(model.post, /(?<!github:[\w-]{1,40}\/)\bnpx atlan-pulse\b/);
 });

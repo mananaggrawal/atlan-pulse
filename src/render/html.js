@@ -9,7 +9,7 @@
 // eyebrow, a headline whose second line is the turn, a metadata byline bar,
 // a bordered key-takeaways card with check bullets, then numbered chapters.
 
-import { ANCHORS } from '../lib/constants.js';
+import { ANCHORS, RUN_COMMAND } from '../lib/constants.js';
 import { resolveLogo } from '../lib/logo.js';
 
 const esc = (s) =>
@@ -537,7 +537,7 @@ footer .cta{font-family:var(--mono);color:var(--blue);font-size:13px}
 
   <footer>
     <p>Generated ${esc(generated.toLocaleString())} by Atlan Pulse v${esc(report.version)}. This file was written to your disk. Nothing was uploaded, and there is no telemetry in this tool.</p>
-    <p class="cta">Run it yourself:  npx github:mananaggrawal/atlan-pulse</p>
+    <p class="cta">Run it yourself:  ${RUN_COMMAND}</p>
     <p>Atlan Pulse is a working prototype built as a work sample. It is not an official Atlan product, and is not affiliated with, endorsed by, or operated by Atlan.</p>
   </footer>
 </div>

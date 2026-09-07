@@ -13,6 +13,7 @@
 // package has no dependencies and will not grow a headless browser to
 // rasterise text. Everything happens in your browser, on your machine.
 
+import { RUN_COMMAND } from '../lib/constants.js';
 import { resolveLogo } from '../lib/logo.js';
 
 const n = (v) => Number(v ?? 0).toLocaleString();
@@ -40,7 +41,7 @@ export function cardModel(report, rolled) {
       (t.neverInvokedShareOfContext
         ? ` — that's ${t.neverInvokedShareOfContext}% of what my skill listing costs on every request.`
         : '.') +
-      `\n\nnpx atlan-pulse`;
+      `\n\n${RUN_COMMAND}`;
   } else if (report.hasInvocationData) {
     lead = `${t.skills} skills installed.`;
     turn = `${n(t.totalInvocations)} invocations in ${report.options.windowDays} days.`;
@@ -48,14 +49,14 @@ export function cardModel(report, rolled) {
       `Ran a skill audit on my own setup. ${t.skills} skills, ` +
       `${n(t.totalInvocations)} invocations in ${report.options.windowDays} days` +
       (t.topShare !== null ? `, and three of them account for ${t.topShare}% of it.` : '.') +
-      `\n\nnpx atlan-pulse`;
+      `\n\n${RUN_COMMAND}`;
   } else {
     lead = `${t.skills} skills installed.`;
     turn = `${n(t.estTokens)} tokens on every request.`;
     post =
       `Ran a skill audit on my own setup. ${t.skills} skills, costing an estimated ` +
       `${n(t.estTokens)} tokens on every single request before I type anything.` +
-      `\n\nnpx atlan-pulse`;
+      `\n\n${RUN_COMMAND}`;
   }
 
   stats.push({ label: 'Skills', value: n(t.skills) });
@@ -127,7 +128,7 @@ function sizedLogo(explicitPath) {
 export function renderCard(report, rolled, options = {}) {
   const model = cardModel(report, rolled);
   const logo = sizedLogo(options.logo ?? report.options?.logo ?? null);
-  const payload = JSON.stringify({ ...model, logo: logo.svg, logoW: logo.w, logoH: logo.h })
+  const payload = JSON.stringify({ ...model, cmd: RUN_COMMAND, logo: logo.svg, logoW: logo.w, logoH: logo.h })
     .replace(/</g, '\\u003c');
 
   return `<!doctype html>
@@ -262,7 +263,7 @@ function draw(logoImg) {
   });
 
   // footer: the command, which is the whole point of the post
-  const cmd = 'npx atlan-pulse';
+  const cmd = D.cmd;
   ctx.font = '500 20px "JetBrains Mono", monospace';
   const cw = ctx.measureText(cmd).width;
   ctx.fillStyle = '#FFFFFF';
