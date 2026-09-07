@@ -1,0 +1,6 @@
+node_modules/
+*.log
+.DS_Store
+atlan-pulse-report.html
+atlan-pulse-card.svg
+atlan-pulse-bundle.json

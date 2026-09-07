@@ -1,0 +1,18 @@
+{
+  "name": "atlan-pulse",
+  "version": "0.1.0",
+  "description": "Skill health for Claude Code and Codex. Scans the agent skills already on your laptop and tells you which ones are dead weight.",
+  "type": "module",
+  "bin": { "atlan-pulse": "src/cli.js" },
+  "main": "src/index.js",
+  "exports": { ".": "./src/index.js" },
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "node --test test/",
+    "demo": "node src/cli.js --dir test/fixtures/skills --transcripts test/fixtures/projects --out /tmp/pulse-demo.html"
+  },
+  "files": ["src", "README.md", "LICENSE"],
+  "keywords": ["claude-code", "codex", "agent-skills", "skills", "health", "audit", "cli"],
+  "license": "MIT",
+  "dependencies": {}
+}

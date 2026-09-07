@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlan Pulse — Skill Health Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#2026D2; --blue-hover:#1D22BC; --cyan:#62E1FC; --pink:#F34D77;
+  --ink:#3E4C59; --ink-strong:#252530; --ink-deep:#141517;
+  --muted:#77778E; --page:#F9F9FC; --surface:#FFFFFF; --line:#DDDDE3; --line-soft:#E9E9F0;
+  --display:"Funnel Display",-apple-system,BlinkMacSystemFont,sans-serif;
+  --body:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;
+  background-image:linear-gradient(rgba(0,0,0,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.035) 1px,transparent 1px);
+  background-size:64px 64px;}
+.wrap{max-width:940px;margin:0 auto;padding:64px 28px 96px}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--blue);margin:0 0 20px}
+h1{font-family:var(--display);font-weight:600;letter-spacing:-.02em;font-size:clamp(34px,5.4vw,58px);line-height:1.08;margin:0 0 22px;color:var(--ink-strong)}
+h1 .turn{color:var(--blue)}
+.lede{font-size:17px;max-width:60ch;margin:0 0 34px;color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:56px}
+.chip{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 14px;display:flex;flex-direction:column;min-width:112px}
+.chip-v{font-family:var(--display);font-weight:600;font-size:24px;color:var(--ink-strong);line-height:1.15}
+.chip-l{font-size:11.5px;color:var(--muted);letter-spacing:.02em}
+h2{font-family:var(--display);font-weight:600;letter-spacing:-.01em;font-size:13px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);margin:0 0 18px}
+.finding,.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:22px 24px;margin-bottom:14px}
+.f-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.f-head h3{font-family:var(--display);font-weight:600;font-size:17px;margin:0;color:var(--ink-strong);flex:1}
+.panel h3{font-family:var(--display);font-weight:600;font-size:17px;margin:0 0 14px;color:var(--ink-strong)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--muted);flex:none}
+.sev-high .dot{background:var(--pink)} .sev-medium .dot{background:var(--blue)} .sev-info .dot{background:var(--cyan)}
+.sev{font-size:11px;color:var(--muted);letter-spacing:.04em}
+.f-line{margin:0 0 8px;font-size:16px;color:var(--ink-strong);font-weight:500}
+.f-detail{margin:0;font-size:13.5px;color:var(--muted);max-width:72ch}
+details{margin-top:14px;border-top:1px solid var(--line-soft);padding-top:12px}
+summary{cursor:pointer;font-size:12.5px;color:var(--blue);font-weight:500;letter-spacing:.02em}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+td{padding:7px 0;border-bottom:1px solid var(--line-soft);vertical-align:top;font-size:13.5px}
+tr:last-child td{border-bottom:none}
+.i-name{font-family:var(--mono);font-size:12.5px;color:var(--ink-strong);white-space:pre-line}
+.i-note{color:var(--muted);text-align:right;font-size:12.5px;white-space:nowrap;padding-left:18px}
+.share{background:var(--ink-deep);border-radius:10px;padding:28px;margin:0 0 14px;color:#fff}
+.share h3{font-family:var(--display);font-weight:600;font-size:18px;margin:0 0 6px;color:#fff}
+.share p{color:#9A9AB4;font-size:13.5px;margin:0 0 20px;max-width:64ch}
+canvas{width:100%;height:auto;border-radius:6px;display:block;border:1px solid rgba(255,255,255,.1)}
+.actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.btn{font-family:var(--body);font-size:14px;font-weight:600;padding:9px 16px;border-radius:6px;border:1.5px solid var(--blue);
+  background:var(--blue);color:#fff;cursor:pointer;text-decoration:none;display:inline-block;line-height:1.2}
+.btn:hover{background:var(--blue-hover);border-color:var(--blue-hover)}
+.btn.ghost{background:transparent;border-color:rgba(255,255,255,.28);color:#fff}
+.btn.ghost:hover{border-color:#fff;background:rgba(255,255,255,.06)}
+code{font-family:var(--mono);font-size:12.5px;background:rgba(32,38,210,.06);padding:1px 5px;border-radius:3px;color:var(--blue)}
+footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);max-width:76ch}
+footer p{margin:0 0 6px}
+@media(max-width:640px){.wrap{padding:40px 18px 64px}.i-note{white-space:normal}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Skill health report</p>
+  <h1>You have 6 skills.<br><span class="turn">2 of them have never run.</span></h1>
+  <p class="lede">Every skill you keep is described to the model on every single request, whether or not it is ever used. This is what yours are costing you, and which ones are earning it.</p>
+  <div class="chips"><div class="chip"><span class="chip-v">6</span><span class="chip-l">skills</span></div><div class="chip"><span class="chip-v">28%</span><span class="chip-l">of listing budget</span></div><div class="chip"><span class="chip-v">6</span><span class="chip-l">invocations / 90d</span></div><div class="chip"><span class="chip-v">2</span><span class="chip-l">never invoked</span></div><div class="chip"><span class="chip-v">1</span><span class="chip-l">duplicate pairs</span></div><div class="chip"><span class="chip-v">1</span><span class="chip-l">without an owner</span></div></div>
+
+  <h2>Findings</h2>
+  <section class="finding sev-info">
+      <div class="f-head">
+        <span class="dot"></span>
+        <h3>Context budget</h3>
+        <span class="sev">context</span>
+      </div>
+      <p class="f-line">Your skill listing costs about 555 tokens on every request — 28% of its budget — and 6% of that is skills you have never invoked.</p>
+      <p class="f-detail">Estimated from 2,220 characters of skill descriptions at ~4 chars/token, against a listing budget of 2,000 tokens (1% of a 200,000-token window). Token counts are estimates, not a tokeniser run.</p>
+      
+    </section>
+  <section class="finding sev-high">
+      <div class="f-head">
+        <span class="dot"></span>
+        <h3>Broad permissions</h3>
+        <span class="sev">needs attention</span>
+      </div>
+      <p class="f-line">1 skill declares broad permissions, 1 of them shell execution.</p>
+      <p class="f-detail">This reads declared frontmatter only. It is not a security scan and cannot see what a skill actually does — treat it as a list of files worth reading before you share them.</p>
+      <details open><summary>1 item</summary><table><tr><td class="i-name">bash-runner</td><td class="i-note">shell execution, network access</td></tr></table></details>
+    </section>
+  <section class="finding sev-medium">
+      <div class="f-head">
+        <span class="dot"></span>
+        <h3>Never invoked</h3>
+        <span class="sev">worth a look</span>
+      </div>
+      <p class="f-line">2 of 6 skills (33%) were never invoked in the last 90 days.</p>
+      <p class="f-detail">Each one still costs context on every request. These are the first candidates to archive.</p>
+      <details><summary>2 items</summary><table><tr><td class="i-name">pdf-exporter</td><td class="i-note">80 chars of description</td></tr><tr><td class="i-name">never-used</td><td class="i-note">58 chars of description</td></tr></table></details>
+    </section>
+  <section class="finding sev-medium">
+      <div class="f-head">
+        <span class="dot"></span>
+        <h3>Likely duplicates</h3>
+        <span class="sev">worth a look</span>
+      </div>
+      <p class="f-line">1 pair of skills look like near-duplicates of each other.</p>
+      <p class="f-detail">Similarity is trigram overlap on name and description at a 55% threshold — a hint to go look, not a verdict. Duplicates are what people create when they cannot find what already exists.</p>
+      <details><summary>1 item</summary><table><tr><td class="i-name">pdf-export  ↔  pdf-exporter</td><td class="i-note">88% similar</td></tr></table></details>
+    </section>
+  <section class="finding sev-medium">
+      <div class="f-head">
+        <span class="dot"></span>
+        <h3>Oversized descriptions</h3>
+        <span class="sev">worth a look</span>
+      </div>
+      <p class="f-line">1 skill exceeds the 1536-character description limit.</p>
+      <p class="f-detail">Descriptions beyond the limit risk being truncated in the listing, which is what the model actually reads when deciding whether to use a skill.</p>
+      <details><summary>1 item</summary><table><tr><td class="i-name">verbose</td><td class="i-note">1919 chars (+383)</td></tr></table></details>
+    </section>
+  <section class="finding sev-low">
+      <div class="f-head">
+        <span class="dot"></span>
+        <h3>Stale</h3>
+        <span class="sev">minor</span>
+      </div>
+      <p class="f-line">1 skill has not been touched in over 180 days.</p>
+      <p class="f-detail">Age alone is not decay — a stable skill is a good skill. It matters most where a stale skill is also heavily invoked, which is where drift shows up.</p>
+      <details><summary>1 item</summary><table><tr><td class="i-name">legacy-thing</td><td class="i-note">2441 days old, 1 invocation</td></tr></table></details>
+    </section>
+  <section class="finding sev-low">
+      <div class="f-head">
+        <span class="dot"></span>
+        <h3>No owner</h3>
+        <span class="sev">minor</span>
+      </div>
+      <p class="f-line">1 of 6 skills (17%) declare no owner.</p>
+      <p class="f-detail">On one laptop this is cosmetic. The moment a second person installs one of these, it is the difference between a skill someone maintains and a skill everyone assumes someone else maintains.</p>
+      <details><summary>1 item</summary><table><tr><td class="i-name">legacy-thing</td><td class="i-note">no owner/author in frontmatter</td></tr></table></details>
+    </section>
+  <section class="finding sev-info">
+      <div class="f-head">
+        <span class="dot"></span>
+        <h3>Concentration</h3>
+        <span class="sev">context</span>
+      </div>
+      <p class="f-line">3 skills account for 83% of your 6 invocations in the last 90 days.</p>
+      <p class="f-detail">A high number here is not a problem in itself — it tells you which skills are worth maintaining, and which of your teammates would benefit most from them.</p>
+      <details><summary>3 items</summary><table><tr><td class="i-name">pdf-export</td><td class="i-note">3 invocations</td></tr><tr><td class="i-name">bash-runner</td><td class="i-note">1 invocation</td></tr><tr><td class="i-name">legacy-thing</td><td class="i-note">1 invocation</td></tr></table></details>
+    </section>
+
+  <h2>Share</h2>
+  <div class="share">
+    <h3>Post the numbers, not the names</h3>
+    <p>This card carries counts and percentages only. No skill name, description or file path from your machine is on it, or in the suggested post.</p>
+    <canvas id="card" width="1200" height="630"></canvas>
+    <div class="actions">
+      <a class="btn" id="dl" download="atlan-pulse-card.png">Download PNG</a>
+      <button class="btn ghost" id="copy">Copy post text</button>
+    </div>
+  </div>
+
+  <h2>Method</h2>
+  <section class="panel">
+      <h3>What this could see</h3>
+      <table><tr><td class="i-name">~/.claude/skills</td><td class="i-note">not found</td></tr><tr><td class="i-name">.claude/skills (this project)</td><td class="i-note">not found</td></tr><tr><td class="i-name">~/.claude/plugins</td><td class="i-note">not found</td></tr><tr><td class="i-name">~/.codex/skills</td><td class="i-note">not found</td></tr><tr><td class="i-name">~/.config/codex/skills</td><td class="i-note">not found</td></tr><tr><td class="i-name">test/fixtures/skills</td><td class="i-note">6 skills</td></tr></table>
+      <p class="f-detail">Read 1 transcript file (9 lines) from <code>~/mnt/Atlan/pulse/test/fixtures/projects</code> and matched 6 skill invocations.</p>
+    </section>
+
+  <footer>
+    <p>Generated 9/7/2026, 12:07:58 PM by Atlan Pulse v0.1.0. This file was written to your disk and nothing was uploaded.</p>
+    <p><strong>Limitations.</strong> Token counts are estimates from character length, not a tokeniser run. Duplicate detection is trigram similarity — a hint, not a verdict. The permissions check reads declared frontmatter and cannot see what a skill actually does. Everything here describes one machine: cross-person duplication and real ownership are not knowable from a solo scan.</p>
+    <p>Atlan Pulse is a working prototype built as a work sample. It is not an official Atlan product, and is not affiliated with, endorsed by, or operated by Atlan.</p>
+  </footer>
+</div>
+<script>
+var STATS = [{"value":"6","label":"skills installed"},{"value":"2","label":"never invoked in 90 days"},{"value":"83%","label":"of all runs are just 3 skills"},{"value":"6%","label":"of context spent on dead skills"}];
+var POST = "I scanned my 6 Claude Code skills. 2 have never been invoked. 3 of them account for 83% of all my invocations. The dead ones eat 6% of my skill-listing context budget. \nCheck yours:  npx atlan-pulse";
+
+function drawCard(){
+  var c = document.getElementById('card');
+  var x = c.getContext('2d');
+  var W = 1200, H = 630;
+  x.fillStyle = '#141517'; x.fillRect(0,0,W,H);
+  x.strokeStyle = 'rgba(255,255,255,0.04)'; x.lineWidth = 2;
+  for (var gx = 0; gx <= W; gx += 64){ x.beginPath(); x.moveTo(gx,0); x.lineTo(gx,H); x.stroke(); }
+  for (var gy = 0; gy <= H; gy += 64){ x.beginPath(); x.moveTo(0,gy); x.lineTo(W,gy); x.stroke(); }
+
+  var g = x.createLinearGradient(100,0,220,0);
+  g.addColorStop(0,'#2026D2'); g.addColorStop(1,'#62E1FC');
+  x.fillStyle = g; x.fillRect(100,96,120,4);
+
+  x.fillStyle = '#62E1FC';
+  x.font = '600 19px Inter, sans-serif';
+  var eyebrow = 'ATLAN PULSE — SKILL HEALTH', ex = 100;
+  for (var i = 0; i < eyebrow.length; i++){ x.fillText(eyebrow[i], ex, 152); ex += x.measureText(eyebrow[i]).width + 3; }
+
+  x.fillStyle = '#FFFFFF';
+  x.font = '600 44px "Funnel Display", sans-serif';
+  x.fillText('Most of my agent skills are dead weight.', 100, 232);
+
+  var cols = STATS.length <= 2 ? STATS.length : 2;
+  for (var j = 0; j < STATS.length; j++){
+    var px = 100 + (j % cols) * (1000 / cols);
+    var py = 322 + Math.floor(j / cols) * 140;
+    x.fillStyle = '#FFFFFF';
+    x.font = '700 72px "Funnel Display", sans-serif';
+    x.fillText(STATS[j].value, px, py);
+    x.fillStyle = '#9A9AB4';
+    x.font = '400 21px Inter, sans-serif';
+    x.fillText(STATS[j].label, px, py + 34);
+  }
+
+  x.fillStyle = '#FFFFFF';
+  x.font = '500 26px "JetBrains Mono", monospace';
+  x.fillText('npx atlan-pulse', 100, 566);
+  x.fillStyle = '#77778E';
+  x.font = '400 18px Inter, sans-serif';
+  x.textAlign = 'right';
+  x.fillText('aggregate numbers only — no skill names left this machine', 1100, 566);
+  x.textAlign = 'left';
+
+  document.getElementById('dl').href = c.toDataURL('image/png');
+}
+
+if (document.fonts && document.fonts.ready) { document.fonts.ready.then(drawCard); setTimeout(drawCard, 1200); }
+else { drawCard(); }
+
+document.getElementById('copy').addEventListener('click', function(e){
+  var btn = e.currentTarget;
+  navigator.clipboard.writeText(POST).then(function(){
+    btn.textContent = 'Copied';
+    setTimeout(function(){ btn.textContent = 'Copy post text'; }, 1800);
+  }, function(){ btn.textContent = 'Copy failed — select it manually'; });
+});
+</script>
+</body>
+</html>
