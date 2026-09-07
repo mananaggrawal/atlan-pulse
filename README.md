@@ -46,7 +46,7 @@ Five of the eight need no history at all and work on a machine you installed thi
 
 ## The report
 
-The report is the point of the tool. It is a single self-contained HTML file, written to your working directory, with no scripts in it and no network calls beyond webfonts — so it can be dropped in Slack, attached to an email, committed next to your skills, opened on a phone, or printed to PDF with Cmd-P and still be itself.
+The report is the point of the tool. It is a single self-contained HTML file, written to your working directory and opened in your browser automatically (skip that with `--no-open`), with no scripts in it and no network calls beyond webfonts — so it can be dropped in Slack, attached to an email, committed next to your skills, opened on a phone, or printed to PDF with Cmd-P and still be itself.
 
 It opens with the headline number and a key-takeaways summary, then runs five numbered chapters:
 
@@ -54,7 +54,7 @@ It opens with the headline number and a key-takeaways summary, then runs five nu
 2. **What you actually use** — a usage leaderboard with each skill's share, and the full never-invoked list
 3. **What needs attention** — every finding, with the skills behind it
 4. **Inventory** — a breakdown by location and owner, then every skill found
-5. **Method and limits** — every location searched, every constant used, and what the tool cannot see
+5. **Method** — every location searched and every constant used, so the numbers above are auditable rather than asserted
 
 Pulse reports what it observed — it does not tell you what to do about it.
 
@@ -97,6 +97,7 @@ npx atlan-pulse
   --stale-days <n>      staleness threshold, default 180
   --out <path>          report path, default ./atlan-pulse-report.html
   --card                also write a share card you can post
+  --no-open             don't open the report automatically when it's done
   --logo <path>         logo for the report masthead (svg or png)
   --json                print the report model instead of writing HTML
   --debug-transcripts   show what was found in the transcripts, then stop

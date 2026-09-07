@@ -42,7 +42,7 @@ const wrap = (text, width = 76, indent = '     ') =>
     .map((l) => indent + l)
     .join('\n');
 
-export function renderTerminal(report, { reportPath, cardPath } = {}) {
+export function renderTerminal(report, { reportPath, cardPath, opened } = {}) {
   const out = [];
   const t = report.totals;
 
@@ -94,10 +94,16 @@ export function renderTerminal(report, { reportPath, cardPath } = {}) {
 
   if (reportPath) {
     out.push(`  ${c.blue('→')} Full report  ${c.bold(reportPath)}`);
-    out.push(c.dim(`     ${fileUrl(reportPath)}`));
+    if (opened !== true) out.push(c.dim(`     ${fileUrl(reportPath)}`));
     out.push('');
-    out.push(c.dim('  Cmd-click the link above to open it, or print to PDF, and send it to'));
-    out.push(c.dim('  whoever owns these skills. It stays on this machine. Nothing was uploaded.'));
+    if (opened === true) {
+      out.push(c.dim('  Opened it in your browser. Print to PDF and send it to whoever owns these skills.'));
+    } else if (opened === false) {
+      out.push(c.dim("  Couldn't open it automatically — open the path or link above by hand."));
+    } else {
+      out.push(c.dim('  Open the path or link above, or print to PDF, and send it to whoever owns these skills.'));
+    }
+    out.push(c.dim('  It stays on this machine. Nothing was uploaded.'));
   }
 
   if (cardPath) {

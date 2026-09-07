@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
+import { spawn } from 'node:child_process';
 import { scan, breakdowns, VERSION } from './index.js';
 import { renderTerminal, c } from './render/terminal.js';
 import { renderHTML } from './render/html.js';
@@ -26,6 +27,7 @@ const HELP = `
     --stale-days <n>      staleness threshold, default ${DEFAULTS.STALE_DAYS}
     --out <path>          report path, default ./atlan-pulse-report.html
     --card                also write a share card you can post
+    --no-open             don't open the report automatically when it's done
     --logo <path>         logo for the report masthead (svg/png)
                           ${c.dim('(or drop one at assets/logo.svg)')}
     --json                print the raw report model instead
@@ -59,9 +61,39 @@ const OPTIONS = {
   into: { type: 'string' },
   yes: { type: 'boolean', default: false },
   force: { type: 'boolean', default: false },
+  'no-open': { type: 'boolean', default: false },
   help: { type: 'boolean', short: 'h', default: false },
   version: { type: 'boolean', short: 'v', default: false },
 };
+
+// Opens a file in whatever the OS considers the default handler, without
+// making the CLI depend on it: failures (headless box, sandboxed shell, no
+// `open`/`xdg-open` on PATH) are swallowed rather than surfaced, because a
+// terminal link the user has to click by hand is a perfectly fine fallback,
+// not a crash.
+function openInBrowser(filePath) {
+  return new Promise((resolve) => {
+    try {
+      const cmd = process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'start' : 'xdg-open';
+      const args = process.platform === 'win32' ? ['', filePath] : [filePath];
+      const child = spawn(cmd, args, { detached: true, stdio: 'ignore', shell: process.platform === 'win32' });
+      let settled = false;
+      child.on('error', () => {
+        if (!settled) { settled = true; resolve(false); }
+      });
+      // A missing/broken opener command emits 'error' near-instantly. If
+      // nothing has fired by the time it would normally have launched, treat
+      // it as opened rather than block the CLI on a browser's own startup
+      // time (which can be seconds, and isn't something to wait out here).
+      setTimeout(() => {
+        if (!settled) { settled = true; resolve(true); }
+      }, 300);
+      child.unref();
+    } catch {
+      resolve(false);
+    }
+  });
+}
 
 function debugTranscripts(report) {
   const t = report.transcripts;
@@ -186,6 +218,7 @@ async function main() {
 
   let reportPath = null;
   let cardPath = null;
+  let opened = null; // null = never tried (--no-open, or nothing to open); true/false = tried
   if (report.totals.skills) {
     reportPath = path.resolve(v.out || 'atlan-pulse-report.html');
     fs.mkdirSync(path.dirname(reportPath), { recursive: true });
@@ -195,9 +228,11 @@ async function main() {
       cardPath = path.join(path.dirname(reportPath), 'atlan-pulse-card.html');
       fs.writeFileSync(cardPath, renderCard(report, rolled, { logo: v.logo ?? null }));
     }
+
+    if (!v['no-open']) opened = await openInBrowser(reportPath);
   }
 
-  console.log(renderTerminal(report, { reportPath, cardPath }));
+  console.log(renderTerminal(report, { reportPath, cardPath, opened }));
   return 0;
 }
 
