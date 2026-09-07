@@ -182,7 +182,9 @@ test('the report renders every chapter and carries the Pulse identity', () => {
   }
   assert.match(html, /@media print/, 'print stylesheet present');
   assert.match(html, /not affiliated with, endorsed by, or operated by Atlan/);
-  assert.match(html, /npx atlan-pulse/);
+  // the report must tell a reader how to run it themselves, in a form that
+  // works before anything is published to npm
+  assert.match(html, /npx github:[\w-]+\/atlan-pulse/, 'runnable command in the footer');
 
   // the full inventory lists every skill, not just the flagged ones
   for (const skill of report.skills) assert.ok(html.includes(skill.name), `${skill.name} missing from report`);

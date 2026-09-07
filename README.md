@@ -1,12 +1,16 @@
+<img src="assets/hero.png" alt="Atlan Pulse — which of your agent skills are dead weight?" width="100%">
+
 # Atlan Pulse
 
 **Skill health for Claude Code and Codex.** One command, no signup, nothing leaves your laptop.
 
 ```bash
-npx atlan-pulse
+npx github:mananaggrawal/atlan-pulse
 ```
 
 Requires **Node 20 or newer** and nothing else — there are no dependencies to install. Check with `node -v`; if that command is not found, install Node from [nodejs.org](https://nodejs.org) or `brew install node`.
+
+> The examples below are written as `atlan-pulse` for readability. If you are running it without installing, put `npx github:mananaggrawal/` in front — so `atlan-pulse pack` becomes `npx github:mananaggrawal/atlan-pulse pack`.
 
 You get a terminal summary and a standalone, shareable HTML report:
 
