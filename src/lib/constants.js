@@ -25,7 +25,7 @@ export const ANCHORS = {
 // one place it is written down: when the package is published, change this line
 // to `npx atlan-pulse` and the report footer, the share card and the suggested
 // post all follow.
-export const RUN_COMMAND = 'npx github:mananaggrawal/atlan-pulse';
+export const RUN_COMMAND = 'npx atlan-pulse';
 
 export const DEFAULTS = {
   STALE_DAYS: 180,

@@ -30,7 +30,7 @@ test('leads on never-run when usage is known', () => {
   const model = cardModel(report, breakdowns(report));
   assert.equal(model.lead, '6 skills installed.');
   assert.equal(model.turn, '2 of them have never run.');
-  assert.match(model.post, /npx github:[\w-]+\/atlan-pulse/, 'suggested post must carry a command that runs');
+  assert.match(model.post, /npx atlan-pulse/, 'suggested post must carry a command that runs');
 });
 
 test('claims nothing about usage when there are no transcripts', () => {
@@ -86,5 +86,9 @@ test('the card and its post carry a command that actually resolves', () => {
 
   assert.ok(model.post.includes(RUN_COMMAND));
   assert.ok(html.includes(RUN_COMMAND));
-  assert.doesNotMatch(model.post, /(?<!github:[\w-]{1,40}\/)\bnpx atlan-pulse\b/);
+  // atlan-pulse@0.1.0 is on the npm registry as of 2026-09-07, so the bare
+  // command resolves. Before that it did not, and this assertion was inverted:
+  // it required the github: prefix and banned the bare form.
+  assert.match(model.post, /\bnpx atlan-pulse\b/);
+  assert.doesNotMatch(model.post, /github:/, 'no longer needs the repo prefix');
 });

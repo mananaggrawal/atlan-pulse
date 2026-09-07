@@ -2,15 +2,17 @@
 
 # Atlan Pulse
 
+[![npm](https://img.shields.io/npm/v/atlan-pulse?color=2026D2&label=npm)](https://www.npmjs.com/package/atlan-pulse)
+[![node](https://img.shields.io/node/v/atlan-pulse?color=2026D2)](https://nodejs.org)
+[![dependencies](https://img.shields.io/badge/dependencies-0-2026D2)](package.json)
+
 **Skill health for Claude Code and Codex.** One command, no signup, nothing leaves your laptop.
 
 ```bash
-npx github:mananaggrawal/atlan-pulse
+npx atlan-pulse
 ```
 
 Requires **Node 20 or newer** and nothing else — there are no dependencies to install. Check with `node -v`; if that command is not found, install Node from [nodejs.org](https://nodejs.org) or `brew install node`.
-
-> The examples below are written as `atlan-pulse` for readability. If you are running it without installing, put `npx github:mananaggrawal/` in front — so `atlan-pulse pack` becomes `npx github:mananaggrawal/atlan-pulse pack`.
 
 You get a terminal summary and a standalone, shareable HTML report:
 
