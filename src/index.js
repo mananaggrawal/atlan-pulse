@@ -15,6 +15,7 @@ export function scan(options = {}) {
     windowDays: options.windowDays ?? DEFAULTS.WINDOW_DAYS,
     staleDays: options.staleDays ?? DEFAULTS.STALE_DAYS,
     duplicateThreshold: options.duplicateThreshold ?? DEFAULTS.NEAR_DUPLICATE_THRESHOLD,
+    logo: options.logo ?? null,
   };
 
   const { skills, roots } = collectSkills({ cwd: opts.cwd, extraDirs: opts.extraDirs });

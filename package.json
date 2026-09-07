@@ -11,7 +11,7 @@
     "test": "node --test test/",
     "demo": "node src/cli.js --dir test/fixtures/skills --transcripts test/fixtures/projects --out /tmp/pulse-demo.html"
   },
-  "files": ["src", "README.md", "LICENSE"],
+  "files": ["src", "assets", "README.md", "LICENSE"],
   "keywords": ["claude-code", "codex", "agent-skills", "skills", "health", "audit", "cli"],
   "license": "MIT",
   "dependencies": {}

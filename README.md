@@ -73,9 +73,20 @@ npx atlan-pulse
   --days <n>            invocation window, default 90
   --stale-days <n>      staleness threshold, default 180
   --out <path>          report path, default ./atlan-pulse-report.html
+  --logo <path>         logo for the report masthead (svg or png)
   --json                print the report model instead of writing HTML
   --debug-transcripts   show what was found in the transcripts, then stop
 ```
+
+## Branding the report
+
+The report ships with a built-in mark. To put your own logo on it, drop the file at `assets/logo.svg` in this repo, or point at one anywhere:
+
+```bash
+npx atlan-pulse --logo ~/Downloads/logo.svg
+```
+
+An SVG is inlined so the report stays one self-contained file; a PNG or JPG is embedded as a data URI. Any `<script>` in a supplied SVG is stripped — the report has no scripts in it and keeps it that way. Nothing is downloaded for you and no logo is bundled: use artwork you have the right to use.
 
 ## Privacy
 

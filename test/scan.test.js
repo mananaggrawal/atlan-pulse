@@ -1,5 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { scan, breakdowns, recommendations } from '../src/index.js';
@@ -196,4 +198,48 @@ test('a report with no usage data still renders, and says so', () => {
   assert.match(html, /Usage data unavailable/);
   assert.match(html, /unavailable</, 'the byline reports it too');
   assert.ok(html.includes('id="inventory"'), 'other chapters still render');
+});
+
+// -- logo ------------------------------------------------------------------
+
+test('a supplied SVG logo is inlined into the masthead', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pulse-logo-'));
+  const file = path.join(dir, 'logo.svg');
+  fs.writeFileSync(file, '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 24"><rect width="100" height="24" fill="#2026D2"/><title>ACME</title></svg>');
+
+  const report = fixtureScan({ logo: file });
+  const html = renderHTML(report, breakdowns(report), []);
+
+  assert.match(html, /<svg class="logo"/, 'the artwork is inlined, not linked');
+  assert.ok(html.includes('viewBox="0 0 100 24"'), 'the original artwork survives');
+  assert.ok(!html.includes('<?xml'), 'the XML declaration is stripped');
+  assert.ok(!html.includes('<svg class="mark"'), 'the built-in mark steps aside');
+  assert.match(html, /<span class="rule"><\/span><span class="wordmark">Pulse<\/span>/, 'lockup becomes logo + Pulse');
+});
+
+test('a raster logo is embedded as a data URI', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pulse-logo-'));
+  const file = path.join(dir, 'logo.png');
+  fs.writeFileSync(file, Buffer.from('89504e470d0a1a0a', 'hex'));
+
+  const report = fixtureScan({ logo: file });
+  const html = renderHTML(report, breakdowns(report), []);
+  assert.match(html, /<img class="logo" src="data:image\/png;base64,/);
+});
+
+test('a missing or unreadable logo falls back to the built-in mark', () => {
+  const report = fixtureScan({ logo: '/definitely/not/here.svg' });
+  const html = renderHTML(report, breakdowns(report), []);
+  assert.match(html, /<svg class="mark"/);
+  assert.match(html, /Atlan <b>Pulse<\/b>/);
+});
+
+test('scripts inside a supplied logo are stripped', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pulse-logo-'));
+  const file = path.join(dir, 'logo.svg');
+  fs.writeFileSync(file, '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><script>alert(1)</script><rect width="10" height="10"/></svg>');
+  const report = fixtureScan({ logo: file });
+  const html = renderHTML(report, breakdowns(report), []);
+  assert.ok(!html.includes('alert(1)'), 'a logo cannot smuggle script into the report');
+  assert.ok(!/<script/.test(html), 'the report still carries no scripts');
 });

@@ -10,6 +10,7 @@
 // a bordered key-takeaways card with check bullets, then numbered chapters.
 
 import { ANCHORS } from '../lib/constants.js';
+import { resolveLogo } from '../lib/logo.js';
 
 const esc = (s) =>
   String(s ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]);
@@ -18,15 +19,6 @@ const n = (v) => Number(v ?? 0).toLocaleString();
 const pct = (v) => `${Math.round(v)}%`;
 
 const SEVERITY_LABEL = { high: 'Needs attention', medium: 'Worth a look', low: 'Minor', info: 'Context' };
-
-// An original mark: bars of varying height reading as an activity trace.
-// Atlan's own mark is stacked horizontal bars; this is its vertical sibling.
-const MARK = `<svg class="mark" width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
-  <rect x="1"  y="14" width="4" height="8"  rx="1.4" fill="#2026D2"/>
-  <rect x="7"  y="9"  width="4" height="13" rx="1.4" fill="#2026D2"/>
-  <rect x="13" y="3"  width="4" height="19" rx="1.4" fill="#62E1FC"/>
-  <rect x="19" y="11" width="4" height="11" rx="1.4" fill="#2026D2"/>
-</svg>`;
 
 const dateShort = (d) =>
   d ? new Date(d).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
@@ -298,6 +290,7 @@ function chapterMethod(report) {
 // ---------------------------------------------------------------------------
 
 export function renderHTML(report, rolled, recs) {
+  const logo = resolveLogo(report.options.logo);
   const h = headline(report);
   const t = report.totals;
   const generated = new Date(report.generatedAt);
@@ -360,6 +353,8 @@ body{margin:0;background:var(--page);color:var(--ink);font-family:var(--body);fo
 .masthead{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:26px 0 0;margin-bottom:52px;flex-wrap:wrap}
 .lockup{display:flex;align-items:center;gap:9px}
 .mark{display:block;flex:none}
+.logo{display:block;flex:none;height:26px;width:auto;max-width:190px}
+.lockup .rule{display:block;width:1px;height:20px;background:var(--line);margin:0 3px}
 .wordmark{font-family:var(--display);font-weight:600;font-size:20px;letter-spacing:-.015em;color:var(--ink-strong)}
 .wordmark b{color:var(--blue);font-weight:600}
 .masthead .kicker{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
@@ -497,7 +492,7 @@ footer .cta{font-family:var(--mono);color:var(--blue);font-size:13px}
 <div class="wrap">
 
   <header class="masthead">
-    <div class="lockup">${MARK}<span class="wordmark">Atlan <b>Pulse</b></span></div>
+    <div class="lockup">${logo.html}${logo.isCustom ? '<span class="rule"></span><span class="wordmark">Pulse</span>' : '<span class="wordmark">Atlan <b>Pulse</b></span>'}</div>
     <span class="kicker">Skill Health Report</span>
   </header>
 

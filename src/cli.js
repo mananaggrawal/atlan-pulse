@@ -24,6 +24,8 @@ const HELP = `
     --days <n>            invocation window, default ${DEFAULTS.WINDOW_DAYS}
     --stale-days <n>      staleness threshold, default ${DEFAULTS.STALE_DAYS}
     --out <path>          report path, default ./atlan-pulse-report.html
+    --logo <path>         logo for the report masthead (svg/png)
+                          ${c.dim('(or drop one at assets/logo.svg)')}
     --json                print the raw report model instead
     --debug-transcripts   show what was found in the transcripts and stop
 
@@ -46,6 +48,7 @@ const OPTIONS = {
   days: { type: 'string' },
   'stale-days': { type: 'string' },
   out: { type: 'string' },
+  logo: { type: 'string' },
   json: { type: 'boolean', default: false },
   'debug-transcripts': { type: 'boolean', default: false },
   top: { type: 'string' },
@@ -106,6 +109,7 @@ async function main() {
     transcriptDir: v.transcripts ?? null,
     windowDays: Number(v.days) || DEFAULTS.WINDOW_DAYS,
     staleDays: Number(v['stale-days']) || DEFAULTS.STALE_DAYS,
+    logo: v.logo ?? null,
   };
 
   if (command === 'help') { console.log(HELP); return 0; }
