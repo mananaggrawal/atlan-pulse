@@ -160,8 +160,12 @@ test('the report renders every chapter and carries the Pulse identity', () => {
   const html = renderHTML(report, breakdowns(report), recommendations(report, breakdowns(report)));
 
   assert.match(html, /<!doctype html>/i);
-  assert.match(html, /Atlan <b>Pulse<\/b>/, 'wordmark lockup present');
-  assert.match(html, /<svg class="mark"/, 'mark present');
+  // Logo-agnostic: assets/logo.svg may or may not be present in a given
+  // checkout, and the identity has to hold either way.
+  assert.match(html, /class="lockup"/, 'masthead lockup present');
+  assert.match(html, /class="wordmark">(Atlan <b>)?Pulse/, 'Pulse wordmark present');
+  assert.match(html, /class="(mark|logo)"/, 'a mark or a supplied logo is rendered');
+  assert.match(html, /Skill Health Report/, 'document type named in the masthead');
   assert.match(html, /Key takeaways/);
   for (const id of ['cost', 'usage', 'attention', 'inventory', 'actions', 'method']) {
     assert.ok(html.includes(`id="${id}"`), `chapter ${id} missing`);
