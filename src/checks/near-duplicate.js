@@ -18,7 +18,7 @@ const jaccard = (a, b) => {
 
 export default {
   id: 'near-duplicate',
-  title: 'Likely duplicates',
+  title: 'Description similarity',
   severity: 'medium',
   run({ skills, options }) {
     const threshold = options.duplicateThreshold ?? DEFAULTS.NEAR_DUPLICATE_THRESHOLD;
@@ -38,8 +38,9 @@ export default {
     pairs.sort((x, y) => y.score - x.score);
     return {
       severity: 'medium',
-      headline: `${pairs.length} pair${pairs.length === 1 ? '' : 's'} of skills look like near-duplicates of each other.`,
-      detail: `Similarity is trigram overlap on name and description at a ${Math.round(threshold * 100)}% threshold — a hint to go look, not a verdict. Duplicates are what people create when they cannot find what already exists.`,
+      headline: `${pairs.length} pair${pairs.length === 1 ? '' : 's'} of skills ${pairs.length === 1 ? 'scores' : 'score'} at or above the ${Math.round(threshold * 100)}% similarity threshold.`,
+      rule: `\u2265${Math.round(threshold * 100)}% trigram overlap`,
+      detail: `Similarity is trigram Jaccard overlap on name + description. No embeddings, no model call. The score measures wording, not behaviour.`,
       items: pairs.map((p) => ({
         name: `${p.a.name}  ↔  ${p.b.name}`,
         note: `${Math.round(p.score * 100)}% similar`,

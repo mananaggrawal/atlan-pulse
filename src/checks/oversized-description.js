@@ -11,7 +11,8 @@ export default {
     return {
       severity: 'medium',
       headline: `${plural(over.length, 'skill')} ${agrees(over.length, 'exceeds', 'exceed')} the ${ANCHORS.MAX_DESCRIPTION_CHARS}-character description limit.`,
-      detail: 'Descriptions beyond the limit risk being truncated in the listing, which is what the model actually reads when deciding whether to use a skill.',
+      rule: `>${ANCHORS.MAX_DESCRIPTION_CHARS} characters`,
+      detail: `Measured on the frontmatter description field only. ${ANCHORS.MAX_DESCRIPTION_CHARS} characters is the documented per-skill cap in the listing.`,
       items: over
         .sort((a, b) => b.descriptionChars - a.descriptionChars)
         .map((s) => ({ name: s.name, note: `${s.descriptionChars} chars (+${s.descriptionChars - ANCHORS.MAX_DESCRIPTION_CHARS})`, path: s.relPath })),

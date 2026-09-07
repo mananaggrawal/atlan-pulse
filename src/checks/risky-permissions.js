@@ -15,7 +15,7 @@ import { plural, agrees } from '../lib/text.js';
 
 export default {
   id: 'risky-permissions',
-  title: 'Broad permissions',
+  title: 'Declared tool access',
   severity: 'medium',
   run({ skills }) {
     const flagged = [];
@@ -31,8 +31,9 @@ export default {
     const shellCount = flagged.filter((f) => f.reasons.includes('shell execution')).length;
     return {
       severity: shellCount ? 'high' : 'medium',
-      headline: `${plural(flagged.length, 'skill')} ${agrees(flagged.length, 'declares', 'declare')} broad permissions${shellCount ? `, ${shellCount} of them shell execution` : ''}.`,
-      detail: 'This reads declared frontmatter only. It is not a security scan and cannot see what a skill actually does.',
+      headline: `${plural(flagged.length, 'skill')} ${agrees(flagged.length, 'declares', 'declare')} shell, network or deletion tools${shellCount ? `; ${shellCount} of them shell execution` : ''}.`,
+      rule: 'declared tool name matches shell, network or deletion patterns',
+      detail: 'Read from the declared allowed-tools frontmatter only. Not a security scan: it cannot see what a skill does at runtime.',
       items: flagged.map((f) => ({
         name: f.skill.name,
         note: f.reasons.join(', '),

@@ -18,7 +18,7 @@ const esc = (s) =>
 const n = (v) => Number(v ?? 0).toLocaleString();
 const pct = (v) => `${Math.round(v)}%`;
 
-const SEVERITY_LABEL = { high: 'Needs attention', medium: 'Worth a look', low: 'Minor', info: 'Context' };
+// No verdict labels. Each finding prints the threshold that fired instead.
 
 const dateShort = (d) =>
   d ? new Date(d).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
@@ -32,7 +32,7 @@ function headline(report) {
     return { lead: `${t.skills} skills installed.`, turn: `${t.neverInvoked} of them have never run.` };
   }
   if (t.duplicatePairs > 0) {
-    return { lead: `${t.skills} skills installed.`, turn: `${t.duplicatePairs} pair${t.duplicatePairs === 1 ? '' : 's'} look like duplicates.` };
+    return { lead: `${t.skills} skills installed.`, turn: `${t.duplicatePairs} pair${t.duplicatePairs === 1 ? '' : 's'} above the similarity threshold.` };
   }
   return { lead: `${t.skills} skills installed.`, turn: `${n(t.estTokens)} tokens on every request.` };
 }
@@ -42,33 +42,33 @@ function takeaways(report, rolled) {
   const out = [];
 
   out.push(
-    `Your skill descriptions cost an estimated <strong>${n(t.estTokens)} tokens on every request</strong> — ${pct(t.pctOfBudget)} of the budget the listing is allotted.`,
+    `Skill descriptions total an estimated <strong>${n(t.estTokens)} tokens per request</strong> — ${pct(t.pctOfBudget)} of the listing budget.`,
   );
 
   if (report.hasInvocationData) {
     if (t.neverInvoked > 0) {
       out.push(
-        `<strong>${t.neverInvoked} of ${t.skills} skills</strong> were never invoked in the last ${report.options.windowDays} days` +
-          (t.neverInvokedShareOfContext ? `, and they account for ${pct(t.neverInvokedShareOfContext)} of that cost.` : '.'),
+        `<strong>${t.neverInvoked} of ${t.skills} skills</strong> recorded zero invocations in the last ${report.options.windowDays} days` +
+          (t.neverInvokedShareOfContext ? `, accounting for ${pct(t.neverInvokedShareOfContext)} of the description tokens.` : '.'),
       );
     }
     if (t.topShare !== null && rolled.leaderboard.length) {
       out.push(
-        `Just <strong>three skills</strong> account for ${pct(t.topShare)} of your ${n(t.totalInvocations)} invocations.`,
+        `<strong>Three skills</strong> account for ${pct(t.topShare)} of ${n(t.totalInvocations)} recorded invocations.`,
       );
     }
   } else {
     out.push(
-      `No session transcripts were found, so usage-based findings are reported as unavailable rather than estimated. The other five checks below do not need them.`,
+      `No session transcripts were found. The three usage checks report as unavailable; the other five do not need transcripts.`,
     );
   }
 
   if (t.duplicatePairs) {
-    out.push(`<strong>${t.duplicatePairs} pair${t.duplicatePairs === 1 ? '' : 's'}</strong> of skills describe near-identical jobs, which forces the model to choose between them.`);
+    out.push(`<strong>${t.duplicatePairs} pair${t.duplicatePairs === 1 ? '' : 's'}</strong> of skills ${t.duplicatePairs === 1 ? 'scores' : 'score'} at or above the ${pct(report.options.duplicateThreshold * 100)} name-and-description similarity threshold.`);
   }
   const risky = report.findings.find((f) => f.id === 'risky-permissions');
   if (risky?.items?.length) {
-    out.push(`<strong>${risky.items.length} skill${risky.items.length === 1 ? '' : 's'}</strong> ${risky.items.length === 1 ? 'declares' : 'declare'} broad permissions — shell, network or deletion.`);
+    out.push(`<strong>${risky.items.length} skill${risky.items.length === 1 ? '' : 's'}</strong> ${risky.items.length === 1 ? 'declares' : 'declare'} shell, network or deletion tools in frontmatter.`);
   }
   if (t.ownerless) {
     out.push(`<strong>${t.ownerless} of ${t.skills}</strong> ${t.ownerless === 1 ? 'declares' : 'declare'} no owner in frontmatter.`);
@@ -97,7 +97,7 @@ function budgetBar(report) {
         ${dead ? `<span><i class="sw dead"></i>Never invoked — ${n(Math.round((t.estTokens * t.neverInvokedShareOfContext) / 100))} tokens</span>` : ''}
         <span><i class="sw rest"></i>Budget ${n(t.budgetTokens)} tokens</span>
       </div>
-      ${over ? `<p class="warn">This listing is over its budget by ${pct(t.pctOfBudget - 100)}. Descriptions are competing for room with your actual prompt.</p>` : ''}
+      ${over ? `<p class="warn">Over the listing budget by ${pct(t.pctOfBudget - 100)}.</p>` : ''}
     </div>`;
 }
 
@@ -134,7 +134,7 @@ function chapterFindings(report) {
         <div class="f-head">
           <span class="dot"></span>
           <h3>${esc(f.title)}</h3>
-          <span class="sev">${esc(SEVERITY_LABEL[f.severity] || '')}</span>
+          <span class="sev">${esc(f.rule || '')}</span>
         </div>
         <p class="f-line">${esc(f.headline)}</p>
         ${f.detail ? `<p class="f-detail">${esc(f.detail)}</p>` : ''}
@@ -148,7 +148,7 @@ function chapterUsage(report, rolled) {
   if (!report.hasInvocationData) {
     return `<div class="panel note">
         <h3>Usage data unavailable</h3>
-        <p class="f-detail">No session transcripts were found at <code>${esc(report.transcripts.dir)}</code>, so this section is empty rather than estimated. Run <code>atlan-pulse --debug-transcripts</code> to see what was searched. Everything else in this report is unaffected.</p>
+        <p class="f-detail">No session transcripts were found at <code>${esc(report.transcripts.dir)}</code>. Nothing in this section is estimated in their absence. Run <code>atlan-pulse --debug-transcripts</code> to list the paths searched.</p>
       </div>`;
   }
 
@@ -180,7 +180,7 @@ function chapterUsage(report, rolled) {
 
   return `${board}
     <h3 class="sub">Never invoked in ${report.options.windowDays} days</h3>
-    <p class="f-detail">These have zero recorded invocations in the window, and still cost context on every request.</p>
+    <p class="f-detail">Zero recorded invocations in the window. Description characters shown are still counted in the listing.</p>
     ${unused}`;
 }
 
@@ -266,7 +266,7 @@ function chapterMethod(report) {
     <h3 class="sub">Usage sources</h3>
     ${transcripts}
     <h3 class="sub">Constants used</h3>
-    <p class="f-detail">Every number in this report is derived from the values below. None of them are hidden, and all of them can be changed.</p>
+    <p class="f-detail">Every number in this report derives from the values below. All are overridable at the command line.</p>
     ${anchors}`;
 }
 
@@ -279,11 +279,11 @@ export function renderHTML(report, rolled) {
   const generated = new Date(report.generatedAt);
 
   const chapters = [
-    { id: 'cost', title: 'The context tax', blurb: 'What your skills cost before anyone types a prompt.' },
-    { id: 'usage', title: 'What you actually use', blurb: 'Which skills earn their place, and which never run.' },
-    { id: 'attention', title: 'What needs attention', blurb: 'Duplicates, permissions, drift and ownership.' },
-    { id: 'inventory', title: 'Inventory', blurb: 'Everything found, where it lives, and who owns it.' },
-    { id: 'method', title: 'Method', blurb: 'Where every number in this report comes from.' },
+    { id: 'cost', title: 'Context cost', blurb: 'Estimated tokens the skill listing adds to every request.' },
+    { id: 'usage', title: 'Invocations', blurb: 'Recorded skill invocations within the usage window.' },
+    { id: 'attention', title: 'Findings', blurb: 'Checks that returned a result, and the threshold each one uses.' },
+    { id: 'inventory', title: 'Inventory', blurb: 'Every skill found, where it lives, and who owns it.' },
+    { id: 'method', title: 'Method', blurb: 'Paths searched, constants and thresholds behind every number.' },
   ];
 
   const body = {
@@ -292,11 +292,10 @@ export function renderHTML(report, rolled) {
       { value: pct(t.pctOfBudget), label: 'of listing budget' },
       { value: n(t.descriptionChars), label: 'characters of description' },
       report.hasInvocationData
-        ? { value: pct(t.neverInvokedShareOfContext ?? 0), label: 'spent on skills that never run' }
+        ? { value: pct(t.neverInvokedShareOfContext ?? 0), label: 'of tokens from zero-invocation skills' }
         : { value: String(t.skills), label: 'skills described every request' },
     ])}
-    ${budgetBar(report)}
-    <p class="prose">Every skill you keep is described to the model on every single request, whether or not it is ever used. That description is not free: it occupies a fixed listing budget, and what sits in it competes for the model's attention with the skills you actually rely on. A skill you wrote in March and forgot about is a standing tax on every prompt since.</p>`,
+    ${budgetBar(report)}`,
     usage: chapterUsage(report, rolled),
     attention: chapterFindings(report),
     inventory: chapterInventory(report, rolled),
@@ -402,7 +401,7 @@ h3.sub{font-family:var(--display);font-weight:600;font-size:16.5px;color:var(--i
 .panel h3{font-family:var(--display);font-weight:600;font-size:17px;margin:0 0 10px;color:var(--ink-strong)}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--muted);flex:none}
 .sev-high .dot{background:var(--pink)} .sev-medium .dot{background:var(--blue)} .sev-info .dot{background:var(--cyan)}
-.sev{font-size:11px;color:var(--muted);letter-spacing:.03em;white-space:nowrap}
+.sev{font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:0;text-align:right;max-width:34ch;flex:none}
 .f-line{margin:0 0 7px;font-size:16px;color:var(--ink-strong);font-weight:500}
 .f-detail{margin:0;font-size:13.5px;color:var(--muted);max-width:76ch}
 
@@ -469,7 +468,7 @@ footer .cta{font-family:var(--mono);color:var(--blue);font-size:13px}
     <span class="kicker">Skill Health Report</span>
   </header>
 
-  <p class="eyebrow">Your local skill catalogue</p>
+  <p class="eyebrow">Local skill catalogue</p>
   <h1>${esc(h.lead)}<br><span class="turn">${esc(h.turn)}</span></h1>
 
   <dl class="byline">

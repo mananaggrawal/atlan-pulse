@@ -21,12 +21,15 @@ export default {
     const severity = pctOfBudget > 100 ? 'high' : pctOfBudget > 60 ? 'medium' : 'info';
 
     const headline = hasInvocationData && dead.length
-      ? `Your skill listing costs about ${totalTokens.toLocaleString()} tokens on every request — ${pctOfBudget}% of its budget — and ${deadShare}% of that is skills you have never invoked.`
-      : `Your skill listing costs about ${totalTokens.toLocaleString()} tokens on every request, roughly ${pctOfBudget}% of the budget it is allotted.`;
+      ? `Skill descriptions total ~${totalTokens.toLocaleString()} tokens per request, ${pctOfBudget}% of the listing budget. ${deadShare}% of that belongs to skills with zero invocations.`
+      : `Skill descriptions total ~${totalTokens.toLocaleString()} tokens per request, ${pctOfBudget}% of the listing budget.`;
+
+    const rule = `${totalTokens.toLocaleString()} of ${budget.toLocaleString()} budgeted tokens`;
 
     return {
       severity,
       headline,
+      rule,
       detail:
         `Estimated from ${totalChars.toLocaleString()} characters of skill descriptions at ~${ANCHORS.CHARS_PER_TOKEN} chars/token, ` +
         `against a listing budget of ${budget.toLocaleString()} tokens (${ANCHORS.LISTING_BUDGET_FRACTION * 100}% of a ${ANCHORS.CONTEXT_WINDOW_TOKENS.toLocaleString()}-token window). ` +

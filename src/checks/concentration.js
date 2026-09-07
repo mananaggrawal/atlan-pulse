@@ -16,8 +16,9 @@ export default {
 
     return {
       severity: 'info',
-      headline: `${top.length} skills account for ${share}% of your ${total.toLocaleString()} invocations in the last ${options.windowDays} days.`,
-      detail: 'A high number here is not a problem in itself.',
+      headline: `${top.length} skills account for ${share}% of ${total.toLocaleString()} invocations in the last ${options.windowDays} days.`,
+      rule: 'top 3 skills by invocation count',
+      detail: 'Share of recorded invocations held by the three most-invoked skills.',
       stat: { totalInvocations: total, topShare: share },
       items: top.map((s) => ({ name: s.name, note: plural(s.invocations, 'invocation'), path: s.relPath })),
     };

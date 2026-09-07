@@ -97,7 +97,7 @@ h3.sub{font-family:var(--display);font-weight:600;font-size:16.5px;color:var(--i
 .panel h3{font-family:var(--display);font-weight:600;font-size:17px;margin:0 0 10px;color:var(--ink-strong)}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--muted);flex:none}
 .sev-high .dot{background:var(--pink)} .sev-medium .dot{background:var(--blue)} .sev-info .dot{background:var(--cyan)}
-.sev{font-size:11px;color:var(--muted);letter-spacing:.03em;white-space:nowrap}
+.sev{font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:0;text-align:right;max-width:34ch;flex:none}
 .f-line{margin:0 0 7px;font-size:16px;color:var(--ink-strong);font-weight:500}
 .f-detail{margin:0;font-size:13.5px;color:var(--muted);max-width:76ch}
 
@@ -117,14 +117,6 @@ td.share{white-space:nowrap}
 .track i{display:block;height:100%;background:var(--blue);border-radius:3px}
 .finding table{margin-top:16px;border-top:1px solid var(--line);padding-top:4px}
 
-/* actions */
-.actions{list-style:none;counter-reset:a;margin:0;padding:0}
-.actions li{counter-increment:a;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px 22px 18px 56px;margin-bottom:10px;position:relative}
-.actions li::before{content:counter(a);position:absolute;left:22px;top:18px;font-family:var(--mono);font-size:12px;color:var(--blue)}
-.a-head{display:flex;justify-content:space-between;align-items:baseline;gap:14px}
-.a-title{font-family:var(--display);font-weight:600;font-size:16px;color:var(--ink-strong)}
-.a-effort{font-size:11px;color:var(--muted);letter-spacing:.04em;white-space:nowrap;border:1px solid var(--line);border-radius:20px;padding:2px 9px}
-.a-why{margin:7px 0 0;font-size:13.5px;color:var(--muted);max-width:76ch}
 
 .limits{margin:14px 0 0;padding-left:20px;font-size:13.5px;color:var(--muted);max-width:78ch}
 .limits li{margin-bottom:7px}
@@ -154,7 +146,7 @@ footer .cta{font-family:var(--mono);color:var(--blue);font-size:13px}
   .chapter{margin-bottom:26px;page-break-inside:auto}
   .chapter-head{page-break-after:avoid;page-break-inside:avoid}
   h2,h3{page-break-after:avoid}
-  .takeaways,.finding,.panel,.actions li,.stats{page-break-inside:avoid;box-shadow:none}
+  .takeaways,.finding,.panel,.stats{page-break-inside:avoid;box-shadow:none}
   /* Keep the contents together, but do not force a break after it — that
      left a near-empty page whenever the list did not fill one. */
   .toc{page-break-inside:avoid}
@@ -172,7 +164,7 @@ footer .cta{font-family:var(--mono);color:var(--blue);font-size:13px}
     <span class="kicker">Skill Health Report</span>
   </header>
 
-  <p class="eyebrow">Your local skill catalogue</p>
+  <p class="eyebrow">Local skill catalogue</p>
   <h1>6 skills installed.<br><span class="turn">2 of them have never run.</span></h1>
 
   <dl class="byline">
@@ -185,20 +177,20 @@ footer .cta{font-family:var(--mono);color:var(--blue);font-size:13px}
 
   <section class="takeaways">
     <h2>Key takeaways</h2>
-    <ul><li>Your skill descriptions cost an estimated <strong>555 tokens on every request</strong> — 28% of the budget the listing is allotted.</li><li><strong>2 of 6 skills</strong> were never invoked in the last 90 days, and they account for 6% of that cost.</li><li>Just <strong>three skills</strong> account for 83% of your 6 invocations — those are the ones worth maintaining, and the ones a teammate would benefit from most.</li><li><strong>1 pair</strong> of skills describe near-identical jobs, which forces the model to choose between them.</li><li><strong>1 skill</strong> declares broad permissions — shell, network or deletion — and should be read before being shared.</li><li><strong>1 of 6</strong> declares no owner, which decides nothing today and decides everything the moment a second person depends on one.</li></ul>
+    <ul><li>Skill descriptions total an estimated <strong>555 tokens per request</strong> — 28% of the listing budget.</li><li><strong>2 of 6 skills</strong> recorded zero invocations in the last 90 days, accounting for 6% of the description tokens.</li><li><strong>Three skills</strong> account for 83% of 6 recorded invocations.</li><li><strong>1 pair</strong> of skills scores at or above the 55% name-and-description similarity threshold.</li><li><strong>1 skill</strong> declares shell, network or deletion tools in frontmatter.</li><li><strong>1 of 6</strong> declares no owner in frontmatter.</li></ul>
   </section>
 
   <nav class="toc">
-    <ol><li><a href="#cost"><span class="t">The context tax</span><span class="b">What your skills cost before anyone types a prompt.</span></a></li><li><a href="#usage"><span class="t">What you actually use</span><span class="b">Which skills earn their place, and which never run.</span></a></li><li><a href="#attention"><span class="t">What needs attention</span><span class="b">Duplicates, permissions, drift and ownership.</span></a></li><li><a href="#inventory"><span class="t">Inventory</span><span class="b">Everything found, where it lives, and who owns it.</span></a></li><li><a href="#actions"><span class="t">Recommended actions</span><span class="b">The specific list, in order of payoff.</span></a></li><li><a href="#method"><span class="t">Method and limits</span><span class="b">Where the numbers come from, and what they cannot tell you.</span></a></li></ol>
+    <ol><li><a href="#cost"><span class="t">Context cost</span><span class="b">Estimated tokens the skill listing adds to every request.</span></a></li><li><a href="#usage"><span class="t">Invocations</span><span class="b">Recorded skill invocations within the usage window.</span></a></li><li><a href="#attention"><span class="t">Findings</span><span class="b">Checks that returned a result, and the threshold each one uses.</span></a></li><li><a href="#inventory"><span class="t">Inventory</span><span class="b">Every skill found, where it lives, and who owns it.</span></a></li><li><a href="#method"><span class="t">Method</span><span class="b">Paths searched, constants and thresholds behind every number.</span></a></li></ol>
   </nav>
 
   <section class="chapter" id="cost">
     <div class="chapter-head">
       <span class="chapter-num">01</span>
-      <h2>The context tax</h2>
-      <p>What your skills cost before anyone types a prompt.</p>
+      <h2>Context cost</h2>
+      <p>Estimated tokens the skill listing adds to every request.</p>
     </div>
-    <div class="stats"><div class="stat"><span class="s-v">555</span><span class="s-l">tokens per request</span><span class="s-n">estimated</span></div><div class="stat"><span class="s-v">28%</span><span class="s-l">of listing budget</span></div><div class="stat"><span class="s-v">2,220</span><span class="s-l">characters of description</span></div><div class="stat"><span class="s-v">6%</span><span class="s-l">spent on skills that never run</span></div></div>
+    <div class="stats"><div class="stat"><span class="s-v">555</span><span class="s-l">tokens per request</span><span class="s-n">estimated</span></div><div class="stat"><span class="s-v">28%</span><span class="s-l">of listing budget</span></div><div class="stat"><span class="s-v">2,220</span><span class="s-l">characters of description</span></div><div class="stat"><span class="s-v">6%</span><span class="s-l">of tokens from zero-invocation skills</span></div></div>
     <div class="bar-wrap">
       <div class="bar" role="img" aria-label="28% of the listing budget used">
         <span class="seg live" style="width:26.32%"></span>
@@ -211,35 +203,34 @@ footer .cta{font-family:var(--mono);color:var(--blue);font-size:13px}
       </div>
       
     </div>
-    <p class="prose">Every skill you keep is described to the model on every single request, whether or not it is ever used. That description is not free: it occupies a fixed listing budget, and what sits in it competes for the model's attention with the skills you actually rely on. A skill you wrote in March and forgot about is a standing tax on every prompt since.</p>
   </section>
   <section class="chapter" id="usage">
     <div class="chapter-head">
       <span class="chapter-num">02</span>
-      <h2>What you actually use</h2>
-      <p>Which skills earn their place, and which never run.</p>
+      <h2>Invocations</h2>
+      <p>Recorded skill invocations within the usage window.</p>
     </div>
     <table class=""><thead><tr><th>#</th><th>Skill</th><th class="num">Runs</th><th class="num">Share</th><th class="num">Last modified</th></tr></thead>
      <tbody><tr><td class="rank">1</td><td class="mono">pdf-export</td><td class="num">3</td><td class="num share"><span class="track"><i style="width:50%"></i></span>50%</td><td class="num muted">0d ago</td></tr><tr><td class="rank">2</td><td class="mono">bash-runner</td><td class="num">1</td><td class="num share"><span class="track"><i style="width:16.7%"></i></span>16.7%</td><td class="num muted">0d ago</td></tr><tr><td class="rank">3</td><td class="mono">legacy-thing</td><td class="num">1</td><td class="num share"><span class="track"><i style="width:16.7%"></i></span>16.7%</td><td class="num muted">2441d ago</td></tr><tr><td class="rank">4</td><td class="mono">verbose</td><td class="num">1</td><td class="num share"><span class="track"><i style="width:16.7%"></i></span>16.7%</td><td class="num muted">0d ago</td></tr></tbody></table>
     <h3 class="sub">Never invoked in 90 days</h3>
-    <p class="f-detail">These cost context on every request and return nothing. They are the cheapest thing on this page to fix.</p>
+    <p class="f-detail">Zero recorded invocations in the window. Description characters shown are still counted in the listing.</p>
     <table class=""><thead><tr><th>Skill</th><th>Owner</th><th class="num">Description</th><th class="num">Last modified</th></tr></thead>
      <tbody><tr><td class="mono">pdf-exporter</td><td class="">manan</td><td class="num muted">80 chars</td><td class="num muted">0d ago</td></tr><tr><td class="mono">never-used</td><td class="">manan</td><td class="num muted">58 chars</td><td class="num muted">0d ago</td></tr></tbody></table>
   </section>
   <section class="chapter" id="attention">
     <div class="chapter-head">
       <span class="chapter-num">03</span>
-      <h2>What needs attention</h2>
-      <p>Duplicates, permissions, drift and ownership.</p>
+      <h2>Findings</h2>
+      <p>Checks that returned a result, and the threshold each one uses.</p>
     </div>
     <div class="finding sev-high">
         <div class="f-head">
           <span class="dot"></span>
-          <h3>Broad permissions</h3>
-          <span class="sev">Needs attention</span>
+          <h3>Declared tool access</h3>
+          <span class="sev">declared tool name matches shell, network or deletion patterns</span>
         </div>
-        <p class="f-line">1 skill declares broad permissions, 1 of them shell execution.</p>
-        <p class="f-detail">This reads declared frontmatter only. It is not a security scan and cannot see what a skill actually does — treat it as a list of files worth reading before you share them.</p>
+        <p class="f-line">1 skill declares shell, network or deletion tools; 1 of them shell execution.</p>
+        <p class="f-detail">Read from the declared allowed-tools frontmatter only. Not a security scan: it cannot see what a skill does at runtime.</p>
         <table class="items"><thead><tr><th>Skill</th><th class="num">Detail</th></tr></thead>
      <tbody><tr><td class="mono">bash-runner</td><td class="num muted">shell execution, network access</td></tr></tbody></table>
       </div>
@@ -247,21 +238,21 @@ footer .cta{font-family:var(--mono);color:var(--blue);font-size:13px}
         <div class="f-head">
           <span class="dot"></span>
           <h3>Never invoked</h3>
-          <span class="sev">Worth a look</span>
+          <span class="sev">zero invocations in 90 days</span>
         </div>
-        <p class="f-line">2 of 6 skills (33%) were never invoked in the last 90 days.</p>
-        <p class="f-detail">Each one still costs context on every request. These are the first candidates to archive.</p>
+        <p class="f-line">2 of 6 skills (33%) recorded zero invocations in the last 90 days.</p>
+        <p class="f-detail">Their description characters are still counted in the listing on every request.</p>
         <table class="items"><thead><tr><th>Skill</th><th class="num">Detail</th></tr></thead>
      <tbody><tr><td class="mono">pdf-exporter</td><td class="num muted">80 chars of description</td></tr><tr><td class="mono">never-used</td><td class="num muted">58 chars of description</td></tr></tbody></table>
       </div>
 <div class="finding sev-medium">
         <div class="f-head">
           <span class="dot"></span>
-          <h3>Likely duplicates</h3>
-          <span class="sev">Worth a look</span>
+          <h3>Description similarity</h3>
+          <span class="sev">≥55% trigram overlap</span>
         </div>
-        <p class="f-line">1 pair of skills look like near-duplicates of each other.</p>
-        <p class="f-detail">Similarity is trigram overlap on name and description at a 55% threshold — a hint to go look, not a verdict. Duplicates are what people create when they cannot find what already exists.</p>
+        <p class="f-line">1 pair of skills scores at or above the 55% similarity threshold.</p>
+        <p class="f-detail">Similarity is trigram Jaccard overlap on name + description. No embeddings, no model call. The score measures wording, not behaviour.</p>
         <table class="items"><thead><tr><th>Skill</th><th class="num">Detail</th></tr></thead>
      <tbody><tr><td class="mono">pdf-export  ↔  pdf-exporter</td><td class="num muted">88% similar</td></tr></tbody></table>
       </div>
@@ -269,21 +260,21 @@ footer .cta{font-family:var(--mono);color:var(--blue);font-size:13px}
         <div class="f-head">
           <span class="dot"></span>
           <h3>Oversized descriptions</h3>
-          <span class="sev">Worth a look</span>
+          <span class="sev">&gt;1536 characters</span>
         </div>
         <p class="f-line">1 skill exceeds the 1536-character description limit.</p>
-        <p class="f-detail">Descriptions beyond the limit risk being truncated in the listing, which is what the model actually reads when deciding whether to use a skill.</p>
+        <p class="f-detail">Measured on the frontmatter description field only. 1536 characters is the documented per-skill cap in the listing.</p>
         <table class="items"><thead><tr><th>Skill</th><th class="num">Detail</th></tr></thead>
      <tbody><tr><td class="mono">verbose</td><td class="num muted">1919 chars (+383)</td></tr></tbody></table>
       </div>
 <div class="finding sev-low">
         <div class="f-head">
           <span class="dot"></span>
-          <h3>Stale</h3>
-          <span class="sev">Minor</span>
+          <h3>Modification age</h3>
+          <span class="sev">&gt;180 days since last modified</span>
         </div>
-        <p class="f-line">1 skill has not been touched in over 180 days.</p>
-        <p class="f-detail">Age alone is not decay — a stable skill is a good skill. It matters most where a stale skill is also heavily invoked, which is where drift shows up.</p>
+        <p class="f-line">1 skill file has a modification date older than 180 days.</p>
+        <p class="f-detail">Age is file mtime. Git does not preserve mtime, so files in a fresh clone report the clone date rather than their real age.</p>
         <table class="items"><thead><tr><th>Skill</th><th class="num">Detail</th></tr></thead>
      <tbody><tr><td class="mono">legacy-thing</td><td class="num muted">2441 days old, 1 invocation</td></tr></tbody></table>
       </div>
@@ -291,10 +282,10 @@ footer .cta{font-family:var(--mono);color:var(--blue);font-size:13px}
         <div class="f-head">
           <span class="dot"></span>
           <h3>No owner</h3>
-          <span class="sev">Minor</span>
+          <span class="sev">no owner or author field in frontmatter</span>
         </div>
         <p class="f-line">1 of 6 skills (17%) declares no owner.</p>
-        <p class="f-detail">On one laptop this is cosmetic. The moment a second person installs one of these, it is the difference between a skill someone maintains and a skill everyone assumes someone else maintains.</p>
+        <p class="f-detail">Owner is read from the `owner` or `author` field in frontmatter. Nothing outside frontmatter is consulted.</p>
         <table class="items"><thead><tr><th>Skill</th><th class="num">Detail</th></tr></thead>
      <tbody><tr><td class="mono">legacy-thing</td><td class="num muted">no owner/author in frontmatter</td></tr></tbody></table>
       </div>
@@ -303,7 +294,7 @@ footer .cta{font-family:var(--mono);color:var(--blue);font-size:13px}
     <div class="chapter-head">
       <span class="chapter-num">04</span>
       <h2>Inventory</h2>
-      <p>Everything found, where it lives, and who owns it.</p>
+      <p>Every skill found, where it lives, and who owns it.</p>
     </div>
     <table class=""><thead><tr><th>Location</th><th class="num">Skills</th><th class="num">Description size</th><th class="num">Runs</th><th class="num">Unused</th></tr></thead>
      <tbody><tr><td class="mono">test/fixtures/skills</td><td class="num">6</td><td class="num muted">2,220 chars</td><td class="num">6</td><td class="num muted">2</td></tr></tbody></table>
@@ -315,37 +306,11 @@ footer .cta{font-family:var(--mono);color:var(--blue);font-size:13px}
     <table class=""><thead><tr><th>Skill</th><th>Owner</th><th class="num">Runs</th><th class="num">Description</th><th class="num">Age</th></tr></thead>
      <tbody><tr><td class="mono">pdf-export</td><td class="">manan</td><td class="num">3</td><td class="num muted">81</td><td class="num muted">0d</td></tr><tr><td class="mono">bash-runner</td><td class="">platform-team</td><td class="num">1</td><td class="num muted">50</td><td class="num muted">0d</td></tr><tr><td class="mono">legacy-thing</td><td class="muted">—</td><td class="num">1</td><td class="num muted">32</td><td class="num muted">2441d</td></tr><tr><td class="mono">verbose</td><td class="">data</td><td class="num">1</td><td class="num muted">1,919</td><td class="num muted">0d</td></tr><tr><td class="mono">never-used</td><td class="">manan</td><td class="num">0</td><td class="num muted">58</td><td class="num muted">0d</td></tr><tr><td class="mono">pdf-exporter</td><td class="">manan</td><td class="num">0</td><td class="num muted">80</td><td class="num muted">0d</td></tr></tbody></table>
   </section>
-  <section class="chapter" id="actions">
-    <div class="chapter-head">
-      <span class="chapter-num">05</span>
-      <h2>Recommended actions</h2>
-      <p>The specific list, in order of payoff.</p>
-    </div>
-    <ol class="actions"><li>
-        <div class="a-head"><span class="a-title">Archive or delete 2 never-invoked skills</span><span class="a-effort">minutes</span></div>
-        <p class="a-why">Reclaims roughly 35 tokens on every request. Nothing calls them today.</p>
-      </li><li>
-        <div class="a-head"><span class="a-title">Reconcile 1 likely-duplicate pair</span><span class="a-effort">an hour</span></div>
-        <p class="a-why">Two skills describing the same job make the model choose, and it will not always choose the one you meant.</p>
-      </li><li>
-        <div class="a-head"><span class="a-title">Read 1 skill that declares broad permissions before sharing</span><span class="a-effort">minutes</span></div>
-        <p class="a-why">These can run commands, reach the network, or delete things. Anyone you send them to inherits that.</p>
-      </li><li>
-        <div class="a-head"><span class="a-title">Trim 1 oversized description</span><span class="a-effort">minutes</span></div>
-        <p class="a-why">Past the listing limit the text risks truncation, and the description is what the model reads when deciding to use a skill at all.</p>
-      </li><li>
-        <div class="a-head"><span class="a-title">Add an owner to 1 skill</span><span class="a-effort">minutes</span></div>
-        <p class="a-why">Cosmetic on one laptop. The moment a second person depends on one of these, it decides who fixes it.</p>
-      </li><li>
-        <div class="a-head"><span class="a-title">Review your 1 most-used skill for drift</span><span class="a-effort">an hour</span></div>
-        <p class="a-why">Heavily invoked and untouched for over 180 days is where quietly-wrong instructions live.</p>
-      </li></ol>
-  </section>
   <section class="chapter" id="method">
     <div class="chapter-head">
-      <span class="chapter-num">06</span>
-      <h2>Method and limits</h2>
-      <p>Where the numbers come from, and what they cannot tell you.</p>
+      <span class="chapter-num">05</span>
+      <h2>Method</h2>
+      <p>Paths searched, constants and thresholds behind every number.</p>
     </div>
     <table class=""><thead><tr><th>Location searched</th><th class="num">Result</th></tr></thead>
      <tbody><tr><td class="mono">~/.claude/skills</td><td class="num muted">not found</td></tr><tr><td class="mono">.claude/skills (this project)</td><td class="num muted">not found</td></tr><tr><td class="mono">~/.claude/plugins</td><td class="num muted">not found</td></tr><tr><td class="mono">~/.codex/skills</td><td class="num muted">not found</td></tr><tr><td class="mono">~/.config/codex/skills</td><td class="num muted">not found</td></tr><tr><td class="mono">test/fixtures/skills</td><td class="num">6 skills</td></tr></tbody></table>
@@ -353,22 +318,13 @@ footer .cta{font-family:var(--mono);color:var(--blue);font-size:13px}
     <table class=""><thead><tr><th>Session transcripts</th><th class="num"></th></tr></thead>
      <tbody><tr><td class="mono">Location searched</td><td class="num muted">~/mnt/Atlan/pulse/test/fixtures/projects</td></tr><tr><td class="mono">Files read</td><td class="num">1</td></tr><tr><td class="mono">Lines read</td><td class="num">9</td></tr><tr><td class="mono">Skill invocations matched</td><td class="num">6</td></tr><tr><td class="mono">Matched by</td><td class="num muted">skill-tool, slash-command</td></tr><tr><td class="mono">Window</td><td class="num muted">90 days</td></tr></tbody></table>
     <h3 class="sub">Constants used</h3>
-    <p class="f-detail">Every number in this report is derived from the values below. None of them are hidden, and all of them can be changed.</p>
+    <p class="f-detail">Every number in this report derives from the values below. All are overridable at the command line.</p>
     <table class=""><thead><tr><th>Constant</th><th>Value</th><th class="num">Where it comes from</th></tr></thead>
      <tbody><tr><td>Skill-listing budget</td><td>1% of context</td><td class="num muted">Anthropic skills documentation</td></tr><tr><td>Assumed context window</td><td>200,000 tokens</td><td class="num muted">configurable</td></tr><tr><td>Description limit</td><td>1,536 chars</td><td class="num muted">Anthropic skills documentation</td></tr><tr><td>Token estimate</td><td>4 chars per token</td><td class="num muted">approximation, not a tokeniser</td></tr><tr><td>Staleness threshold</td><td>180 days</td><td class="num muted">--stale-days</td></tr><tr><td>Duplicate threshold</td><td>55% trigram overlap</td><td class="num muted">name + description</td></tr></tbody></table>
-    <h3 class="sub">What this cannot see</h3>
-    <ul class="limits">
-      <li><strong>Token counts are estimates</strong> from character length, not a tokeniser run.</li>
-      <li><strong>Duplicate detection is trigram similarity</strong> over names and descriptions. It is a hint to go and look, not a verdict.</li>
-      <li><strong>The permissions check reads declared frontmatter.</strong> It is not a security scan and cannot see what a skill actually does.</li>
-      <li><strong>Usage depends on local session transcripts, which only the Claude Code CLI writes.</strong> The desktop app keeps no readable session history on disk, so on such a machine usage findings are omitted rather than estimated.</li>
-      <li><strong>This reads transcripts and nothing else.</strong> Files that look like keys or credentials are never opened, and are not named in any output.</li>
-      <li><strong>This describes one machine.</strong> Cross-person duplication and real ownership are not knowable from a solo scan; they become answerable the moment a second person runs it.</li>
-    </ul>
   </section>
 
   <footer>
-    <p>Generated 9/7/2026, 1:20:05 PM by Atlan Pulse v0.1.0. This file was written to your disk. Nothing was uploaded, and there is no telemetry in this tool.</p>
+    <p>Generated 9/7/2026, 2:07:51 PM by Atlan Pulse v0.1.0. This file was written to your disk. Nothing was uploaded, and there is no telemetry in this tool.</p>
     <p class="cta">Run it yourself:  npx atlan-pulse</p>
     <p>Atlan Pulse is a working prototype built as a work sample. It is not an official Atlan product, and is not affiliated with, endorsed by, or operated by Atlan.</p>
   </footer>

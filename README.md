@@ -31,16 +31,16 @@ Pulse reads what is already on your machine and tells you which skills are earni
 
 ## What it checks
 
-| Check | What it means |
-|---|---|
-| **Context budget** | What your skill descriptions cost on every request, and how much of that is spent on skills nobody invokes |
-| **Never invoked** | In your catalogue, zero invocations in the window |
-| **Concentration** | What share of all your runs comes from just three skills |
-| **Broad permissions** | Skills declaring shell execution, network access or deletion |
-| **Likely duplicates** | Near-identical skills — what people create when they cannot find what already exists |
-| **Oversized descriptions** | Descriptions past the 1,536-character listing limit, which risk being truncated |
-| **Stale** | Untouched in over 180 days — which matters most where a skill is *also* heavily used |
-| **No owner** | No owner or author declared in frontmatter |
+| Check | Measures | Criterion |
+|---|---|---|
+| **Context budget** | Estimated description tokens per request, and the share held by skills with zero invocations | tokens vs. a 2,000-token listing budget |
+| **Never invoked** | Skills with no recorded invocation in the window | zero invocations in 90 days |
+| **Concentration** | Share of recorded invocations held by the three most-invoked skills | top 3 by invocation count |
+| **Declared tool access** | Skills whose declared tools include shell execution, network access or deletion | declared tool name matches those patterns |
+| **Description similarity** | Pairs of skills whose name + description overlap | ≥55% trigram overlap |
+| **Oversized descriptions** | Descriptions above the listing cap | >1,536 characters |
+| **Modification age** | Skill files by last-modified date | >180 days since modified |
+| **No owner** | Skills with no owner declared | no owner or author field in frontmatter |
 
 Five of the eight need no history at all and work on a machine you installed this morning. The three invocation-based ones read your local session transcripts.
 
@@ -50,15 +50,13 @@ The report is the point of the tool. It is a single self-contained HTML file, wr
 
 It opens with the headline number and a key-takeaways summary, then runs five numbered chapters:
 
-1. **The context tax** — what your skills cost before anyone types a prompt, and how much of it is spent on skills that never run
-2. **What you actually use** — a usage leaderboard with each skill's share, and the full never-invoked list
-3. **What needs attention** — every finding, with the skills behind it
+1. **Context cost** — estimated tokens the listing adds to every request, and the share held by skills with zero invocations
+2. **Invocations** — a usage leaderboard with each skill's share, and the full never-invoked list
+3. **Findings** — every check that returned a result, each printed with the criterion that produced it
 4. **Inventory** — a breakdown by location and owner, then every skill found
 5. **Method** — every location searched and every constant used, so the numbers above are auditable rather than asserted
 
-Pulse reports what it observed — it does not tell you what to do about it.
-
-Nothing in it is hidden or hand-waved: the constants that produce each number are printed in chapter 6, next to where they came from.
+The report states what was measured and how. It does not rate, rank by judgment, or recommend actions — the constants and thresholds behind every number are printed in chapter 5.
 
 ## Post the score
 

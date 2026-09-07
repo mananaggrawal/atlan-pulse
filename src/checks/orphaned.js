@@ -9,7 +9,8 @@ export default {
     return {
       severity: pct > 80 ? 'medium' : 'low',
       headline: `${orphans.length} of ${skills.length} skills (${pct}%) ${orphans.length === 1 ? 'declares' : 'declare'} no owner.`,
-      detail: 'On one laptop this is cosmetic. The moment a second person installs one of these, it is the difference between a skill someone maintains and a skill everyone assumes someone else maintains.',
+      rule: 'no owner or author field in frontmatter',
+      detail: 'Owner is read from the `owner` or `author` field in frontmatter. Nothing outside frontmatter is consulted.',
       items: orphans.map((s) => ({ name: s.name, note: 'no owner/author in frontmatter', path: s.relPath })),
     };
   },

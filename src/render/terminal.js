@@ -78,7 +78,7 @@ export function renderTerminal(report, { reportPath, cardPath, opened } = {}) {
   for (const f of report.findings) {
     if (!f.headline) continue;
     const badge = (BADGE[f.severity] || BADGE.info)(f.title);
-    out.push(`  ${badge}`);
+    out.push(`  ${badge}${f.rule ? c.dim(`  ${f.rule}`) : ''}`);
     out.push(wrap(f.headline, 74));
     if (f.items?.length) {
       const shown = f.items.slice(0, 5);
@@ -97,11 +97,11 @@ export function renderTerminal(report, { reportPath, cardPath, opened } = {}) {
     if (opened !== true) out.push(c.dim(`     ${fileUrl(reportPath)}`));
     out.push('');
     if (opened === true) {
-      out.push(c.dim('  Opened it in your browser. Print to PDF and send it to whoever owns these skills.'));
+      out.push(c.dim('  Opened it in your browser. Cmd-P prints it to PDF.'));
     } else if (opened === false) {
       out.push(c.dim("  Couldn't open it automatically — open the path or link above by hand."));
     } else {
-      out.push(c.dim('  Open the path or link above, or print to PDF, and send it to whoever owns these skills.'));
+      out.push(c.dim('  Open the path or link above, or print it to PDF.'));
     }
     out.push(c.dim('  It stays on this machine. Nothing was uploaded.'));
   }

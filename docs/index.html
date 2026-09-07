@@ -185,33 +185,29 @@ footer{background:var(--ink-deep);color:rgba(255,255,255,.55);padding:40px 0 48p
 
   41 skills across 2 locations, 3,106 invocations in 90 days
 
-  <span class="g">◇ Context budget</span>
-     Your skill listing costs about 4,180 tokens on every request — 27% of
-     its budget — and 34% of that is skills you have never invoked.
+  <span class="r">● Context budget</span>  <span class="d">4,180 of 2,000 budgeted tokens</span>
+     Skill descriptions total ~4,180 tokens per request, 209% of the listing
+     budget. 34% of that belongs to skills with zero invocations.
 
-  <span class="r">● Never invoked</span>
-     14 of 41 skills (34%) were never invoked in the last 90 days.
+  <span class="r">● Never invoked</span>  <span class="d">zero invocations in 90 days</span>
+     14 of 41 skills (34%) recorded zero invocations in the last 90 days.
 
-  <span class="r">● Likely duplicates</span>
-     3 pairs of skills look like near-duplicates of each other.
+  <span class="r">● Description similarity</span>  <span class="d">≥55% trigram overlap</span>
+     3 pairs of skills score at or above the 55% similarity threshold.
        pdf-export  ↔  pdf-exporter  — 88% similar
 
-  <span class="r">● Broad permissions</span>
-     2 skills declare broad permissions, 1 of them shell execution.
+  <span class="r">● Declared tool access</span>  <span class="d">shell, network or deletion</span>
+     2 skills declare shell, network or deletion tools; 1 of them shell
+     execution.
 
-  <span class="bl">● Oversized descriptions</span>
+  <span class="bl">● Oversized descriptions</span>  <span class="d">&gt;1536 characters</span>
      1 skill exceeds the 1536-character description limit.
 
-  <span class="d">○ No owner</span>
+  <span class="d">○ No owner</span>  <span class="d">no owner or author field in frontmatter</span>
      9 of 41 skills (22%) declare no owner.
 
-  <span class="g">◇ Concentration</span>
-     3 skills account for 71% of your 3,106 invocations in the last 90 days.
-
-  <span class="b">What to do about it</span>
-     1. Archive or delete 14 never-invoked skills  <span class="d">· minutes</span>
-     2. Reconcile 3 likely-duplicate pairs  <span class="d">· an hour</span>
-     3. Read 2 skills that declare broad permissions before sharing  <span class="d">· minutes</span>
+  <span class="g">◇ Concentration</span>  <span class="d">top 3 skills by invocation count</span>
+     3 skills account for 71% of 3,106 invocations in the last 90 days.
 
   <span class="bl">→</span> Full report  <span class="b">./atlan-pulse-report.html</span>
 
@@ -241,10 +237,10 @@ footer{background:var(--ink-deep);color:rgba(255,255,255,.55);padding:40px 0 48p
       <div class="check"><h4><i></i>Never invoked</h4><p>Installed. Never once used.</p></div>
       <div class="check"><h4><i></i>Concentration</h4><p>Which few skills do most of the work.</p></div>
       <div class="check"><h4><i></i>Context budget</h4><p>What each skill costs you, every request.</p></div>
-      <div class="check"><h4><i></i>Stale</h4><p>Untouched for months, still loaded daily.</p></div>
+      <div class="check"><h4><i></i>Modification age</h4><p>Files untouched for over 180 days.</p></div>
       <div class="check"><h4><i></i>No owner</h4><p>Nobody listed. Nobody to fix it.</p></div>
-      <div class="check"><h4><i></i>Likely duplicates</h4><p>Two skills doing the same job.</p></div>
-      <div class="check tier1"><h4><i></i>Broad permissions</h4><p>Shell or network access it never uses.</p></div>
+      <div class="check"><h4><i></i>Description similarity</h4><p>Name and description overlap above 55%.</p></div>
+      <div class="check tier1"><h4><i></i>Declared tool access</h4><p>Shell, network or deletion tools in frontmatter.</p></div>
       <div class="check tier1"><h4><i></i>Oversized descriptions</h4><p>Past the 1,536-character limit.</p></div>
     </div>
   </div>
