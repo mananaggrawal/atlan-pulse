@@ -1,3 +1,5 @@
+import { sep } from 'node:path';
+
 const useColor = process.env.NO_COLOR === undefined && process.stdout.isTTY;
 const rgb = (r, g, b) => (s) => (useColor ? `\x1b[38;2;${r};${g};${b}m${s}\x1b[0m` : s);
 
@@ -10,6 +12,15 @@ export const c = {
   bold: (s) => (useColor ? `\x1b[1m${s}\x1b[0m` : s),
   dim: (s) => (useColor ? `\x1b[2m${s}\x1b[0m` : s),
 };
+
+// A clickable terminal hyperlink (OSC 8) wrapping visible text, so "open the
+// report" can be a click instead of a copy-paste. Falls back to plain text
+// wherever colour is off (piped output, NO_COLOR, non-TTY) or the terminal
+// doesn't understand OSC 8 — worst case it prints the escape as a no-op.
+const link = (text, url) => (useColor ? `\x1b]8;;${url}\x1b\\${text}\x1b]8;;\x1b\\` : text);
+
+const fileUrl = (absPath) =>
+  'file://' + absPath.split(sep).map(encodeURIComponent).join('/');
 
 const BADGE = {
   high: (s) => c.pink(`● ${s}`),
@@ -46,10 +57,10 @@ export function renderTerminal(report, { reportPath, cardPath } = {}) {
     out.push('');
     out.push(c.muted('  Point it somewhere else with --dir <path>.'));
     out.push('');
-    out.push(c.muted('  On the Claude desktop app? Skills live in your account, not as files —'));
-    out.push(c.muted('  this only reads skills on disk (Claude Code / Codex CLI, or a repo you'));
-    out.push(c.muted('  point it at with --dir). Try it against a skills repo or a teammate on'));
-    out.push(c.muted('  the CLI to see a real report.'));
+    out.push(c.muted('  On the Claude desktop app and still nothing? Ask Claude, in a session with'));
+    out.push(c.muted('  file access, to write each of your skills out as real SKILL.md files in a'));
+    out.push(c.muted('  folder on this machine — then point this at that folder with --dir. See'));
+    out.push(c.muted('  "No local skills?" in the README for the exact prompt to use.'));
     out.push('');
     return out.join('\n');
   }
@@ -81,9 +92,9 @@ export function renderTerminal(report, { reportPath, cardPath } = {}) {
   }
 
   if (reportPath) {
-    out.push(`  ${c.blue('→')} Full report  ${c.bold(reportPath)}`);
+    out.push(`  ${c.blue('→')} Full report  ${link(c.bold(reportPath), fileUrl(reportPath))}`);
     out.push('');
-    out.push(c.dim('  Open it, or print to PDF, and send it to whoever owns these skills.'));
+    out.push(c.dim('  Click the path to open it, or print to PDF, and send it to whoever owns these skills.'));
     out.push(c.dim('  It stays on this machine. Nothing was uploaded.'));
   }
 

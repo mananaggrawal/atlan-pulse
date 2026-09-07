@@ -128,6 +128,20 @@ Worth stating plainly, because a tool like this is easy to over-trust:
 - **It reads transcripts and nothing else.** Files that look like keys or credentials are never opened, and their names are withheld from diagnostic output — that output ends up in screenshots and issues.
 - **Everything here describes one machine.** Cross-person duplication and real ownership are not knowable from a solo scan. They become answerable the moment a second person runs it.
 
+## No local skills?
+
+If `npx atlan-pulse` still comes back empty after the desktop-app fix above — say you're not on a Claude Code CLI or Codex machine at all, and nothing writes `SKILL.md` files to your disk — there's no folder for Pulse to read. The fix isn't a new command, it's getting your skills onto disk once. Open a Claude session that has file access on this machine (Claude Code, or Cowork with a connected folder) and ask it to do the export in plain English, e.g.:
+
+> Write each of my skills out as real `SKILL.md` files (with `name` and `description` frontmatter) into a new folder called `skills-export` here, one subfolder per skill.
+
+Then point Pulse at it:
+
+```bash
+npx atlan-pulse --dir ./skills-export
+```
+
+That's a real scan of real frontmatter — every check that doesn't need invocation history (context budget, no owner, duplicates, oversized descriptions, staleness) runs exactly as it would on a CLI machine. Only the three usage-based checks stay unavailable, same as on any desktop-app-only machine.
+
 ## Adding a check
 
 Checks are separate modules on purpose. A new one is a file and a line:

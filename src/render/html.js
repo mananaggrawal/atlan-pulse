@@ -267,16 +267,7 @@ function chapterMethod(report) {
     ${transcripts}
     <h3 class="sub">Constants used</h3>
     <p class="f-detail">Every number in this report is derived from the values below. None of them are hidden, and all of them can be changed.</p>
-    ${anchors}
-    <h3 class="sub">What this cannot see</h3>
-    <ul class="limits">
-      <li><strong>Token counts are estimates</strong> from character length, not a tokeniser run.</li>
-      <li><strong>Duplicate detection is trigram similarity</strong> over names and descriptions. It is a hint to go and look, not a verdict.</li>
-      <li><strong>The permissions check reads declared frontmatter.</strong> It is not a security scan and cannot see what a skill actually does.</li>
-      <li><strong>Usage depends on local session transcripts, which only the Claude Code CLI writes.</strong> The desktop app keeps no readable session history on disk, so on such a machine usage findings are omitted rather than estimated.</li>
-      <li><strong>This reads transcripts and nothing else.</strong> Files that look like keys or credentials are never opened, and are not named in any output.</li>
-      <li><strong>This describes one machine.</strong> Cross-person duplication and real ownership are not knowable from a solo scan; they become answerable the moment a second person runs it.</li>
-    </ul>`;
+    ${anchors}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -292,7 +283,7 @@ export function renderHTML(report, rolled) {
     { id: 'usage', title: 'What you actually use', blurb: 'Which skills earn their place, and which never run.' },
     { id: 'attention', title: 'What needs attention', blurb: 'Duplicates, permissions, drift and ownership.' },
     { id: 'inventory', title: 'Inventory', blurb: 'Everything found, where it lives, and who owns it.' },
-    { id: 'method', title: 'Method and limits', blurb: 'Where the numbers come from, and what they cannot tell you.' },
+    { id: 'method', title: 'Method', blurb: 'Where every number in this report comes from.' },
   ];
 
   const body = {
