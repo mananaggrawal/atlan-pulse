@@ -1,4 +1,4 @@
-<img src="assets/hero.png" alt="Atlan Pulse — which of your agent skills are dead weight?" width="100%">
+<img src="https://raw.githubusercontent.com/mananaggrawal/atlan-pulse/master/assets/hero.png" alt="Atlan Pulse — which of your agent skills are dead weight?" width="100%">
 
 # Atlan Pulse
 

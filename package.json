@@ -11,7 +11,7 @@
     "test": "node --test test/*.test.js",
     "demo": "node src/cli.js --dir test/fixtures/skills --transcripts test/fixtures/projects --card --out ./atlan-pulse-report.html"
   },
-  "files": ["src", "assets", "README.md", "LICENSE"],
+  "files": ["src", "assets/logo.svg", "README.md", "LICENSE"],
   "keywords": ["claude-code", "codex", "agent-skills", "skills", "health", "audit", "cli"],
   "license": "MIT",
   "dependencies": {}
