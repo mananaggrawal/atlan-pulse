@@ -3,8 +3,10 @@
 // The report is the thing you send to one person. This is the thing you post.
 // It carries three numbers and no skill names: what you have, what you use,
 // and what the dead weight is costing you. That distinction is deliberate —
-// people who will not share a skill library will happily share a score, and a
-// score gives away nothing a competitor could use.
+// plenty of people who would not publish a skill library to a timeline will
+// happily publish a score, and a score gives away nothing a competitor could
+// use. The skills are still meant to travel; they travel through `pack`, to
+// one teammate at a time, which is a different act with a different audience.
 //
 // Output is a single HTML file that draws the card on a canvas and hands you a
 // real PNG with one click. Canvas rather than a static image because this

@@ -57,7 +57,7 @@ It opens with the headline number and a key-takeaways summary, then runs six num
 
 Nothing in it is hidden or hand-waved: the constants that produce each number are printed in chapter 6, next to where they came from.
 
-## Post the score, not the skills
+## Post the score
 
 ```bash
 npx atlan-pulse --card
@@ -65,7 +65,9 @@ npx atlan-pulse --card
 
 Writes `atlan-pulse-card.html` next to the report. Open it, hit **Download PNG**, and you have something sized for a timeline: your skill count, your invocations, how many have never run, and the command you ran to find out.
 
-It carries numbers and nothing else — no skill names, no descriptions, no hint of what you work on. That is the point. Plenty of people who would never publish their skill library will happily publish a score, and a score gives away nothing a competitor could use. There is a test in the suite that fails if a skill name ever reaches the card.
+It carries numbers and nothing else — no skill names, no descriptions, no hint of what you work on. That is the point. Plenty of people who would not publish their skill library to a timeline will happily publish a score, and a score gives away nothing a competitor could use. There is a test in the suite that fails if a skill name ever reaches the card.
+
+The skills themselves are meant to be shared — just privately, and with people you pick. That is `pack`, next.
 
 ## Send it to someone
 
