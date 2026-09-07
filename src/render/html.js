@@ -250,7 +250,10 @@ function chapterMethod(report) {
   const transcripts = table(
     ['Session transcripts', { label: '', num: true }],
     [
-      [{ text: 'Location', cls: 'mono' }, { text: tr.dir, cls: 'num muted' }],
+      ...(tr.searched ?? [{ dir: tr.dir, found: tr.available }]).map((x) => [
+        { text: 'Location searched', cls: 'mono' },
+        { text: `${x.dir}${x.found ? '' : ' — not found'}`, cls: 'num muted' },
+      ]),
       [{ text: 'Files read', cls: 'mono' }, { text: n(tr.filesRead), cls: 'num' }],
       [{ text: 'Lines read', cls: 'mono' }, { text: n(tr.linesRead), cls: 'num' }],
       [{ text: 'Skill invocations matched', cls: 'mono' }, { text: n(tr.eventsFound), cls: 'num' }],

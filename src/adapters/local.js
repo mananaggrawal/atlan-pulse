@@ -154,10 +154,24 @@ function skillFromToolUse(block) {
   return null;
 }
 
+/** Every place a harness is known to keep session transcripts. */
+export function defaultTranscriptDirs() {
+  return [
+    path.join(HOME, '.claude', 'projects'),
+    path.join(HOME, '.claude', 'sessions'),
+    path.join(HOME, '.codex', 'sessions'),
+    path.join(HOME, '.config', 'codex', 'sessions'),
+  ];
+}
+
+const tilde = (p) => (p.startsWith(HOME) ? p.replace(HOME, '~') : p);
+
 export function collectInvocations({ transcriptDir, windowDays = DEFAULTS.WINDOW_DAYS } = {}) {
-  const dir = transcriptDir ? path.resolve(transcriptDir) : path.join(HOME, '.claude', 'projects');
+  const dirs = transcriptDir ? [path.resolve(transcriptDir)] : defaultTranscriptDirs();
+  const present = dirs.filter((d) => exists(d));
   const report = {
-    dir: dir.startsWith(HOME) ? dir.replace(HOME, '~') : dir,
+    dir: present.map(tilde).join(', ') || tilde(dirs[0]),
+    searched: dirs.map((d) => ({ dir: tilde(d), found: exists(d) })),
     available: false,
     filesRead: 0,
     linesRead: 0,
@@ -170,20 +184,22 @@ export function collectInvocations({ transcriptDir, windowDays = DEFAULTS.WINDOW
     latest: null,
   };
 
-  if (!exists(dir)) return { counts: new Map(), lastSeen: new Map(), report };
+  if (!present.length) return { counts: new Map(), lastSeen: new Map(), report };
 
   const files = [];
   const walk = (d, depth = 0) => {
-    if (depth > 4) return;
+    if (depth > 5) return;
     let entries;
     try { entries = fs.readdirSync(d, { withFileTypes: true }); } catch { return; }
     for (const e of entries) {
       const full = path.join(d, e.name);
       if (e.isDirectory()) walk(full, depth + 1);
-      else if (e.isFile() && e.name.endsWith('.jsonl')) files.push(full);
+      // .json is here because not every harness writes line-delimited files;
+      // a whole-file JSON array of events is handled below.
+      else if (e.isFile() && (e.name.endsWith('.jsonl') || e.name.endsWith('.json'))) files.push(full);
     }
   };
-  walk(dir);
+  for (const d of present) walk(d);
 
   const cutoff = Date.now() - windowDays * 86_400_000;
   const counts = new Map();
@@ -194,7 +210,19 @@ export function collectInvocations({ transcriptDir, windowDays = DEFAULTS.WINDOW
     try { raw = fs.readFileSync(file, 'utf8'); } catch { continue; }
     report.filesRead += 1;
 
-    for (const line of raw.split('\n')) {
+    // Normalise both shapes to one JSON document per line.
+    let lines;
+    if (file.endsWith('.json')) {
+      try {
+        const parsed = JSON.parse(raw);
+        const events = Array.isArray(parsed) ? parsed : (parsed.messages ?? parsed.events ?? parsed.entries ?? []);
+        lines = (Array.isArray(events) ? events : []).map((e) => JSON.stringify(e));
+      } catch { lines = []; }
+    } else {
+      lines = raw.split('\n');
+    }
+
+    for (const line of lines) {
       if (!line.trim()) continue;
       report.linesRead += 1;
 

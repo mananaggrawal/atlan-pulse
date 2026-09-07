@@ -63,7 +63,11 @@ const OPTIONS = {
 function debugTranscripts(report) {
   const t = report.transcripts;
   console.log('');
-  console.log(`  ${c.blue('◆')} ${c.bold('Transcripts')} ${c.dim(t.dir)}`);
+  console.log(`  ${c.blue('◆')} ${c.bold('Transcripts')}`);
+  console.log('');
+  for (const s of t.searched ?? []) {
+    console.log(`     ${s.found ? c.cyan('·') : c.muted('✗')} ${s.found ? s.dir : c.muted(s.dir)}`);
+  }
   console.log('');
   console.log(`     files read      ${t.filesRead.toLocaleString()}`);
   console.log(`     lines read      ${t.linesRead.toLocaleString()}`);

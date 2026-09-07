@@ -70,6 +70,7 @@ h1 .turn{color:var(--cyan);display:block}
 .term pre{margin:0;padding:20px 22px 24px;font-family:var(--mono);font-size:12.5px;line-height:1.85;color:#C9CBE4;overflow-x:auto}
 .term .p{color:#6D6F94}
 .term .g{color:#62E1FC}
+.term .bl{color:#6F76F5}
 .term .w{color:#F3B14D}
 .term .r{color:#F34D77}
 .term .ok{color:#4ADE80}
@@ -110,7 +111,7 @@ section.band.first{padding-top:132px}
 .stat .n{font-family:var(--display);font-size:26px;font-weight:600;letter-spacing:-0.02em;color:var(--cyan)}
 .stat .l{font-size:13.5px;color:rgba(255,255,255,.62);margin-top:6px;line-height:1.55}
 
-.share{margin-top:40px;display:grid;grid-template-columns:1fr .85fr;gap:20px;align-items:start}
+.share{margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
 .share > *{min-width:0}
 .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:28px 30px}
 .card.lead{border-color:#C9CBF4;background:linear-gradient(180deg,#F4F5FF 0%,#FFF 100%)}
@@ -120,15 +121,6 @@ pre.blk{max-width:100%;margin:16px 0 0;background:var(--ink-deep);color:#E6E6F2;
 pre.blk .c{color:#8A8AA8}
 pre.blk .g{color:var(--cyan)}
 
-.sharecard{background:linear-gradient(160deg,#1A1D6E 0%,#14152B 100%);border-radius:12px;padding:26px;color:#fff;border:1px solid #2A2C4A}
-.sharecard .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:rgba(255,255,255,.5)}
-.sharecard .big{font-family:var(--display);font-size:40px;font-weight:600;letter-spacing:-0.03em;margin-top:10px;line-height:1}
-.sharecard .big em{font-style:normal;color:var(--cyan)}
-.sharecard .sub{font-size:13.5px;color:rgba(255,255,255,.7);margin-top:10px;line-height:1.55}
-.sharecard .row{display:flex;gap:20px;margin-top:20px;padding-top:18px;border-top:1px solid rgba(255,255,255,.14)}
-.sharecard .row div{font-size:12.5px;color:rgba(255,255,255,.62)}
-.sharecard .row b{display:block;font-family:var(--display);font-size:19px;color:#fff;font-weight:600;letter-spacing:-0.02em}
-.sharecard .foot{margin-top:18px;font-family:var(--mono);font-size:11.5px;color:rgba(255,255,255,.42)}
 
 .cta{margin-top:100px;background:radial-gradient(900px 420px at 50% 0%,#3B41E8 0%,rgba(59,65,232,0) 65%),linear-gradient(180deg,#1A1D6E 0%,#14152B 100%);color:#fff;padding:88px 0 92px;text-align:center;position:relative;overflow:hidden}
 .cta::before{content:"";position:absolute;inset:0;background-image:linear-gradient(90deg,rgba(255,255,255,.05) 2px,transparent 2px),linear-gradient(rgba(255,255,255,.05) 2px,transparent 2px);background-size:64px 64px;mask-image:radial-gradient(100% 80% at 50% 0%,#000 30%,transparent 100%)}
@@ -183,14 +175,41 @@ footer{background:var(--ink-deep);color:rgba(255,255,255,.55);padding:40px 0 48p
       <div class="term-bar"><span></span><span></span><span></span><em>~/work — npx atlan-pulse</em></div>
 <pre><span class="p">$</span> npx atlan-pulse
 
-  Scanned <span class="b">41 skills</span>
+  <span class="bl">◆</span> <span class="b">Atlan Pulse</span> <span class="d">· skill health</span>
 
-  <span class="r">✗  14 never invoked</span>
-  <span class="w">!   3 near-duplicates</span>
-  <span class="w">!   9 orphaned</span>
-  <span class="ok">✓  18 healthy</span>
+  41 skills across 2 locations, 3,106 invocations in 90 days
 
-  Report  <span class="g">./atlan-pulse-report.html</span>
+  <span class="g">◇ Context budget</span>
+     Your skill listing costs about 4,180 tokens on every request — 27% of
+     its budget — and 34% of that is skills you have never invoked.
+
+  <span class="r">● Never invoked</span>
+     14 of 41 skills (34%) were never invoked in the last 90 days.
+
+  <span class="r">● Likely duplicates</span>
+     3 pairs of skills look like near-duplicates of each other.
+       pdf-export  ↔  pdf-exporter  — 88% similar
+
+  <span class="r">● Broad permissions</span>
+     2 skills declare broad permissions, 1 of them shell execution.
+
+  <span class="bl">● Oversized descriptions</span>
+     1 skill exceeds the 1536-character description limit.
+
+  <span class="d">○ No owner</span>
+     9 of 41 skills (22%) declare no owner.
+
+  <span class="g">◇ Concentration</span>
+     3 skills account for 71% of your 3,106 invocations in the last 90 days.
+
+  <span class="b">What to do about it</span>
+     1. Archive or delete 14 never-invoked skills  <span class="d">· minutes</span>
+     2. Reconcile 3 likely-duplicate pairs  <span class="d">· an hour</span>
+     3. Read 2 skills that declare broad permissions before sharing  <span class="d">· minutes</span>
+
+  <span class="bl">→</span> Full report  <span class="b">./atlan-pulse-report.html</span>
+
+  <span class="d">It stays on this machine. Nothing was uploaded.</span>
 </pre>
     </div>
   </div>
@@ -215,12 +234,12 @@ footer{background:var(--ink-deep);color:rgba(255,255,255,.55);padding:40px 0 48p
     <div class="checks">
       <div class="check"><h4><i></i>Never invoked</h4><p>Installed. Never once used.</p></div>
       <div class="check"><h4><i></i>Concentration</h4><p>Which few skills do most of the work.</p></div>
-      <div class="check"><h4><i></i>Context cost</h4><p>What each skill costs you, every session.</p></div>
+      <div class="check"><h4><i></i>Context budget</h4><p>What each skill costs you, every request.</p></div>
       <div class="check"><h4><i></i>Stale</h4><p>Untouched for months, still loaded daily.</p></div>
-      <div class="check"><h4><i></i>Orphaned</h4><p>No owner. No one to fix it.</p></div>
-      <div class="check"><h4><i></i>Near-duplicates</h4><p>Two skills doing the same job.</p></div>
-      <div class="check tier1"><h4><i></i>Risky permissions</h4><p>Access wider than the skill needs.</p></div>
-      <div class="check tier1"><h4><i></i>Failing</h4><p>Used often. Errors often.</p></div>
+      <div class="check"><h4><i></i>No owner</h4><p>Nobody listed. Nobody to fix it.</p></div>
+      <div class="check"><h4><i></i>Likely duplicates</h4><p>Two skills doing the same job.</p></div>
+      <div class="check tier1"><h4><i></i>Broad permissions</h4><p>Shell or network access it never uses.</p></div>
+      <div class="check tier1"><h4><i></i>Oversized descriptions</h4><p>Past the 1,536-character limit.</p></div>
     </div>
   </div>
 </section>
@@ -240,7 +259,7 @@ footer{background:var(--ink-deep);color:rgba(255,255,255,.55);padding:40px 0 48p
       <div class="step">
         <span class="step-n">02</span>
         <h3>Read the report</h3>
-        <p>A summary in your terminal, and a file you can open or send on.</p>
+        <p>A summary, a ranked list of what to fix, and a report you can send on.</p>
       </div>
       <div class="step">
         <span class="step-n">03</span>
@@ -255,7 +274,7 @@ footer{background:var(--ink-deep);color:rgba(255,255,255,.55);padding:40px 0 48p
   <div class="wrap">
     <div class="stats">
       <div class="stat"><div class="n">Local &amp; read-only</div><div class="l">Nothing is uploaded. Nothing is changed.</div></div>
-      <div class="stat"><div class="n">Opt-in only</div><div class="l">Sharing your numbers is a separate command, and it's anonymous.</div></div>
+      <div class="stat"><div class="n">Works with what you have</div><div class="l">Your existing Claude Code and Codex skill folders.</div></div>
       <div class="stat"><div class="n">Nothing to install</div><div class="l">One command. No account, no setup.</div></div>
     </div>
   </div>
@@ -265,31 +284,20 @@ footer{background:var(--ink-deep);color:rgba(255,255,255,.55);padding:40px 0 48p
   <div class="wrap">
     <div class="sec-head">
       <span class="eyebrow">Share it</span>
-      <h2>Your report ends with a card you can post.</h2>
-      <p class="lede">Just the numbers. No skill names, no content.</p>
+      <h2>Send the good ones to your team.</h2>
+      <p class="lede">Pack what survived. They install it with one line.</p>
     </div>
     <div class="share">
       <div class="card lead">
-        <h3>Get your numbers</h3>
-        <pre class="blk">npx atlan-pulse
-<span class="c"># → ./atlan-pulse-report.html</span>
-
-npx atlan-pulse pack
-<span class="c"># → one-line install for a teammate</span>
-
-npx atlan-pulse --contribute
-<span class="c"># → opt in to the public benchmark</span></pre>
-        <p style="margin-top:16px">A downloadable image, and a caption ready to paste.</p>
+        <h3>You</h3>
+        <pre class="blk">npx atlan-pulse pack
+<span class="c"># → atlan-pulse-bundle.json</span></pre>
+        <p>Bundles your most-used skills into one file. Put it anywhere they can reach — a gist, a PR, Slack.</p>
       </div>
-      <div class="sharecard">
-        <div class="k">My agent skills</div>
-        <div class="big">41 skills.<br><em>14 never used.</em></div>
-        <div class="sub">Top 3 skills are 71% of everything I run.</div>
-        <div class="row">
-          <div><b>7,412</b>chars per session</div>
-          <div><b>34%</b>of that, wasted</div>
-        </div>
-        <div class="foot">npx atlan-pulse</div>
+      <div class="card">
+        <h3>Them</h3>
+        <pre class="blk">npx atlan-pulse install &lt;url&gt;</pre>
+        <p>Straight into their skills folder. Nothing to sign up for.</p>
       </div>
     </div>
   </div>
