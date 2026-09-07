@@ -13,12 +13,13 @@ export const c = {
   dim: (s) => (useColor ? `\x1b[2m${s}\x1b[0m` : s),
 };
 
-// A clickable terminal hyperlink (OSC 8) wrapping visible text, so "open the
-// report" can be a click instead of a copy-paste. Falls back to plain text
-// wherever colour is off (piped output, NO_COLOR, non-TTY) or the terminal
-// doesn't understand OSC 8 — worst case it prints the escape as a no-op.
-const link = (text, url) => (useColor ? `\x1b]8;;${url}\x1b\\${text}\x1b]8;;\x1b\\` : text);
-
+// file:// URLs, printed as plain text. OSC-8 hyperlinks would be tidier but
+// Terminal.app — what most people on a Mac actually have open — doesn't
+// render them at all; it just prints the escape codes as noise around the
+// text. Terminal.app (and iTerm2, and most others) DOES auto-detect a bare
+// file:// URL in its output and make it cmd-clickable on its own, with no
+// escape codes required, so that is what actually opens with a click
+// everywhere rather than only in the terminals that opted into OSC-8.
 const fileUrl = (absPath) =>
   'file://' + absPath.split(sep).map(encodeURIComponent).join('/');
 
@@ -92,15 +93,17 @@ export function renderTerminal(report, { reportPath, cardPath } = {}) {
   }
 
   if (reportPath) {
-    out.push(`  ${c.blue('→')} Full report  ${link(c.bold(reportPath), fileUrl(reportPath))}`);
+    out.push(`  ${c.blue('→')} Full report  ${c.bold(reportPath)}`);
+    out.push(c.dim(`     ${fileUrl(reportPath)}`));
     out.push('');
-    out.push(c.dim('  Click the path to open it, or print to PDF, and send it to whoever owns these skills.'));
-    out.push(c.dim('  It stays on this machine. Nothing was uploaded.'));
+    out.push(c.dim('  Cmd-click the link above to open it, or print to PDF, and send it to'));
+    out.push(c.dim('  whoever owns these skills. It stays on this machine. Nothing was uploaded.'));
   }
 
   if (cardPath) {
     out.push('');
     out.push(`  ${c.blue('→')} Share card   ${c.bold(cardPath)}`);
+    out.push(c.dim(`     ${fileUrl(cardPath)}`));
     out.push('');
     out.push(c.dim('  Numbers only, no skill names. Open it and hit Download PNG.'));
   }
