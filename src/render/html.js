@@ -285,7 +285,8 @@ function chapterMethod(report) {
       <li><strong>Token counts are estimates</strong> from character length, not a tokeniser run.</li>
       <li><strong>Duplicate detection is trigram similarity</strong> over names and descriptions. It is a hint to go and look, not a verdict.</li>
       <li><strong>The permissions check reads declared frontmatter.</strong> It is not a security scan and cannot see what a skill actually does.</li>
-      <li><strong>Usage depends on local session transcripts.</strong> Where they are missing or unrecognised, usage findings are omitted rather than estimated.</li>
+      <li><strong>Usage depends on local session transcripts, which only the Claude Code CLI writes.</strong> The desktop app keeps no readable session history on disk, so on such a machine usage findings are omitted rather than estimated.</li>
+      <li><strong>This reads transcripts and nothing else.</strong> Files that look like keys or credentials are never opened, and are not named in any output.</li>
       <li><strong>This describes one machine.</strong> Cross-person duplication and real ownership are not knowable from a solo scan; they become answerable the moment a second person runs it.</li>
     </ul>`;
 }

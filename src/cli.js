@@ -84,6 +84,11 @@ function debugTranscripts(report) {
     for (const [ext, count] of exts) console.log(`     ${String(count).padStart(7)}  ${ext}`);
     console.log('');
   }
+  if (t.sensitiveSkipped) {
+    console.log(c.dim(`  ${t.sensitiveSkipped} file(s) look like keys or credentials. They were not opened,`));
+    console.log(c.dim('  and their names are withheld from this output on purpose.'));
+    console.log('');
+  }
   if (t.skippedFiles) {
     console.log(c.dim(`  ${t.skippedFiles} file(s) were not read because the extension is not .json or .jsonl:`));
     console.log('');

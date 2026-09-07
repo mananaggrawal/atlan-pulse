@@ -119,6 +119,17 @@ export function collectSkills({ cwd = process.cwd(), extraDirs = [] } = {}) {
 
 const SKILL_TOOL_NAMES = new Set(['skill', 'get_skill', 'runskill', 'invokeskill']);
 
+// Transcript directories are not exclusively transcripts. ~/.claude/sessions
+// on a desktop-app machine holds session ENCRYPTION KEYS. This tool reads
+// transcripts and nothing else: anything that looks like a secret is neither
+// opened nor named in diagnostic output, because that output gets pasted into
+// issues and screenshots.
+const SECRET_EXTENSIONS = new Set(['.key', '.pem', '.p12', '.pfx', '.crt', '.cer', '.keychain', '.token', '.secret', '.env']);
+const SECRET_NAME = /(^\.env|credential|secret|token|password|private[-_]?key|id_rsa|id_ed25519)/i;
+
+const looksSensitive = (name) =>
+  SECRET_EXTENSIONS.has(path.extname(name).toLowerCase()) || SECRET_NAME.test(name);
+
 const cleanSkillName = (raw) => {
   if (typeof raw !== 'string') return null;
   let s = raw.trim();
@@ -178,6 +189,7 @@ export function collectInvocations({ transcriptDir, windowDays = DEFAULTS.WINDOW
     seenExtensions: {},
     skippedFiles: 0,
     sampleSkipped: [],
+    sensitiveSkipped: 0,
     available: false,
     filesRead: 0,
     linesRead: 0,
@@ -204,6 +216,12 @@ export function collectInvocations({ transcriptDir, windowDays = DEFAULTS.WINDOW
 
       const ext = path.extname(e.name).toLowerCase() || '(no extension)';
       report.seenExtensions[ext] = (report.seenExtensions[ext] || 0) + 1;
+
+      if (looksSensitive(e.name)) {
+        // Counted so the census still adds up, never opened, never named.
+        report.sensitiveSkipped += 1;
+        continue;
+      }
 
       // .json is here because not every harness writes line-delimited files;
       // a whole-file JSON array of events is handled below.

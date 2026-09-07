@@ -71,7 +71,9 @@ It writes Markdown files and nothing else. It never executes anything. It refuse
 ```
 npx atlan-pulse
   --dir <path>          also scan this directory (repeatable)
-  --transcripts <path>  session transcripts (default: ~/.claude/projects)
+  --transcripts <path>  session transcripts
+                        (default: ~/.claude/projects, ~/.claude/sessions,
+                         and the Codex session directories)
   --days <n>            invocation window, default 90
   --stale-days <n>      staleness threshold, default 180
   --out <path>          report path, default ./atlan-pulse-report.html
@@ -101,7 +103,8 @@ Worth stating plainly, because a tool like this is easy to over-trust:
 - **Token counts are estimates** from character length, not a tokeniser run.
 - **Duplicate detection is trigram similarity** on names and descriptions. It is a hint to go and look, not a verdict.
 - **The permissions check reads declared frontmatter.** It is not a security scan and cannot see what a skill actually does.
-- **Invocation counts depend on local session transcripts.** If none are found, the three invocation-based checks are reported as unavailable rather than estimated. Run `--debug-transcripts` to see what was found. Transcript formats change between versions; if yours is not recognised, the tool names in that output are the fix, and they live in one place: `SKILL_TOOL_NAMES` in `src/adapters/local.js`.
+- **Invocation counts depend on local session transcripts, which only the Claude Code CLI writes.** Verified against its `~/.claude/projects/**/*.jsonl` format. The Claude desktop app keeps no readable session history on disk — `~/.claude/sessions` there holds encryption keys, not transcripts — so on a desktop-only machine the three invocation-based checks report as unavailable rather than guessing. Run `--debug-transcripts` to see exactly what was searched and found; if a format is unrecognised, the tool names in that output are the fix, and they live in one place: `SKILL_TOOL_NAMES` in `src/adapters/local.js`.
+- **It reads transcripts and nothing else.** Files that look like keys or credentials are never opened, and their names are withheld from diagnostic output — that output ends up in screenshots and issues.
 - **Everything here describes one machine.** Cross-person duplication and real ownership are not knowable from a solo scan. They become answerable the moment a second person runs it.
 
 ## Adding a check

@@ -256,3 +256,31 @@ test('scripts inside a supplied logo are stripped', () => {
   assert.ok(!html.includes('alert(1)'), 'a logo cannot smuggle script into the report');
   assert.ok(!/<script/.test(html), 'the report still carries no scripts');
 });
+
+// -- transcript directories are not exclusively transcripts -----------------
+
+test('files that look like keys or credentials are never opened or named', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pulse-secrets-'));
+  // Shaped after a real ~/.claude/sessions, which holds session encryption keys.
+  fs.writeFileSync(path.join(dir, '6505.0e409d9ae4b6070966bf4e03.key'), 'SUPERSECRETKEYMATERIAL');
+  fs.writeFileSync(path.join(dir, '.env'), 'API_TOKEN=hunter2');
+  fs.writeFileSync(path.join(dir, 'credentials.json'), '{"token":"hunter2"}');
+  fs.writeFileSync(path.join(dir, 'notes.log'), 'ordinary file');
+
+  const report = fixtureScan({ transcriptDir: dir });
+  const t = report.transcripts;
+
+  assert.equal(t.sensitiveSkipped, 3, 'the .key, the .env and credentials.json');
+  assert.equal(t.filesRead, 0, 'credentials.json must not be read even though it ends in .json');
+
+  const serialised = JSON.stringify(t);
+  assert.ok(!serialised.includes('6505.0e409d9ae4b6070966bf4e03'), 'key filename withheld');
+  assert.ok(!serialised.includes('credentials.json'), 'credential filename withheld');
+  assert.ok(!serialised.includes('hunter2'), 'no contents anywhere');
+  assert.ok(!serialised.includes('SUPERSECRET'), 'no key material anywhere');
+
+  // an ordinary unreadable file is still named, because that is the diagnostic
+  assert.ok(t.sampleSkipped.some((f) => f.endsWith('notes.log')));
+  // the census still accounts for everything seen
+  assert.equal(t.seenExtensions['.key'], 1);
+});

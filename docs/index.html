@@ -111,18 +111,9 @@ section.band.first{padding-top:132px}
 .stat .n{font-family:var(--display);font-size:26px;font-weight:600;letter-spacing:-0.02em;color:var(--cyan)}
 .stat .l{font-size:13.5px;color:rgba(255,255,255,.62);margin-top:6px;line-height:1.55}
 
-.share{margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
-.share > *{min-width:0}
-.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:28px 30px}
-.card.lead{border-color:#C9CBF4;background:linear-gradient(180deg,#F4F5FF 0%,#FFF 100%)}
-.card h3{font-size:20px}
-.card p{margin-top:11px;font-size:14.5px;line-height:1.62}
-pre.blk{max-width:100%;margin:16px 0 0;background:var(--ink-deep);color:#E6E6F2;border-radius:9px;padding:15px 17px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.8}
-pre.blk .c{color:#8A8AA8}
-pre.blk .g{color:var(--cyan)}
 
 
-.cta{margin-top:100px;background:radial-gradient(900px 420px at 50% 0%,#3B41E8 0%,rgba(59,65,232,0) 65%),linear-gradient(180deg,#1A1D6E 0%,#14152B 100%);color:#fff;padding:88px 0 92px;text-align:center;position:relative;overflow:hidden}
+.cta{background:radial-gradient(900px 420px at 50% 0%,#3B41E8 0%,rgba(59,65,232,0) 65%),linear-gradient(180deg,#1A1D6E 0%,#14152B 100%);color:#fff;padding:88px 0 92px;text-align:center;position:relative;overflow:hidden}
 .cta::before{content:"";position:absolute;inset:0;background-image:linear-gradient(90deg,rgba(255,255,255,.05) 2px,transparent 2px),linear-gradient(rgba(255,255,255,.05) 2px,transparent 2px);background-size:64px 64px;mask-image:radial-gradient(100% 80% at 50% 0%,#000 30%,transparent 100%)}
 .cta > .wrap{position:relative}
 .cta h2{color:#fff;font-size:clamp(28px,3.6vw,42px)}
@@ -136,11 +127,12 @@ footer{background:var(--ink-deep);color:rgba(255,255,255,.55);padding:40px 0 48p
 .disclosure{margin-top:14px;font-size:12.5px;color:rgba(255,255,255,.4);max-width:74ch;line-height:1.6}
 
 @media (max-width:900px){
-  .checks,.steps,.split,.share,.stats{grid-template-columns:1fr}
+  .checks,.steps,.split,.stats{grid-template-columns:1fr}
   .split > div:first-child{border-right:0;border-bottom:1px solid var(--line)}
   .nav-links a:not(.btn){display:none}
   section.band{padding-top:76px}
-  .dark,.cta{margin-top:76px;padding:56px 0}
+  .dark{margin-top:76px}
+  .dark,.cta{padding:56px 0}
   .term{margin-bottom:-44px}
   .hero-in{padding-top:56px}
 }
@@ -155,7 +147,7 @@ footer{background:var(--ink-deep);color:rgba(255,255,255,.55);padding:40px 0 48p
       <a href="#gap">Why</a>
       <a href="#checks">What it checks</a>
       <a href="#how">How it works</a>
-      <a class="btn btn-on-dark" href="#start">Run it</a>
+      <a class="btn btn-on-dark" href="#top">Run it</a>
     </div>
   </div>
 </nav>
@@ -279,30 +271,6 @@ footer{background:var(--ink-deep);color:rgba(255,255,255,.55);padding:40px 0 48p
     </div>
   </div>
 </section>
-
-<section class="band" id="start">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow">Share it</span>
-      <h2>Send the good ones to your team.</h2>
-      <p class="lede">Pack what survived. They install it with one line.</p>
-    </div>
-    <div class="share">
-      <div class="card lead">
-        <h3>You</h3>
-        <pre class="blk">npx atlan-pulse pack
-<span class="c"># → atlan-pulse-bundle.json</span></pre>
-        <p>Bundles your most-used skills into one file. Put it anywhere they can reach — a gist, a PR, Slack.</p>
-      </div>
-      <div class="card">
-        <h3>Them</h3>
-        <pre class="blk">npx atlan-pulse install &lt;url&gt;</pre>
-        <p>Straight into their skills folder. Nothing to sign up for.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section class="cta">
   <div class="wrap">
     <h2>You already have the skills.<span class="turn">Find out which ones work.</span></h2>
@@ -319,7 +287,7 @@ footer{background:var(--ink-deep);color:rgba(255,255,255,.55);padding:40px 0 48p
       <div style="display:flex;gap:22px;flex-wrap:wrap">
         <a href="#checks">What it checks</a>
         <a href="#how">How it works</a>
-        <a href="#start">Run it</a>
+        <a href="#top">Run it</a>
       </div>
     </div>
     <p class="disclosure">A working prototype built as a work sample. Not an official Atlan product, and not affiliated with or endorsed by Atlan.</p>
