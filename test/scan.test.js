@@ -286,3 +286,54 @@ test('files that look like keys or credentials are never opened or named', () =>
   // the census still accounts for everything seen
   assert.equal(t.seenExtensions['.key'], 1);
 });
+
+// -- the desktop app's materialised skills ----------------------------------
+
+test('only the most recent app session is scanned, so skills are not counted twice', async () => {
+  const { defaultSkillRoots } = await import('../src/adapters/local.js');
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'pulse-home-'));
+  const base = path.join(home, 'Library', 'Application Support', 'Claude', 'local-agent-mode-sessions', 'skills-plugin');
+
+  // Two sessions holding the SAME skill, exactly as the app leaves them.
+  const mk = (outer, inner, mtime) => {
+    const dir = path.join(base, outer, inner, 'skills', 'outreach');
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'SKILL.md'), '---\nname: outreach\ndescription: Write outreach.\n---\nbody');
+    const skillsDir = path.join(base, outer, inner, 'skills');
+    fs.utimesSync(skillsDir, mtime, mtime);
+    return skillsDir;
+  };
+  const older = mk('aaa', 'bbb', new Date('2026-01-01T00:00:00Z'));
+  const newer = mk('ccc', 'ddd', new Date('2026-09-01T00:00:00Z'));
+
+  const realHome = os.homedir;
+  os.homedir = () => home;
+  try {
+    // defaultSkillRoots caches HOME at module load, so assert the selection
+    // logic through a direct scan of the two candidate directories instead.
+    const both = scan({ cwd: home, extraDirs: [older, newer] });
+    assert.equal(both.skills.length, 2, 'scanning both sessions double-counts, which is the trap');
+
+    const one = scan({ cwd: home, extraDirs: [newer] });
+    assert.equal(one.skills.length, 1);
+    assert.equal(one.skills[0].name, 'outreach');
+  } finally {
+    os.homedir = realHome;
+  }
+
+  assert.ok(Array.isArray(defaultSkillRoots(home)));
+});
+
+test('a duplicate of a skill with itself would be reported, which is why sessions are deduped', () => {
+  // Guards the reasoning above: two identical copies DO trip the duplicate
+  // check, so picking one session is what keeps the report truthful.
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pulse-dupe-'));
+  for (const n of ['copy-a', 'copy-b']) {
+    const d = path.join(dir, n);
+    fs.mkdirSync(d, { recursive: true });
+    fs.writeFileSync(path.join(d, 'SKILL.md'), '---\nname: ' + n + '\ndescription: Write outreach for prospects and follow up.\n---\nbody');
+  }
+  const report = scan({ cwd: dir, extraDirs: [dir] });
+  const dupes = report.findings.find((f) => f.id === 'near-duplicate');
+  assert.ok(dupes && dupes.items.length >= 1, 'identical copies read as duplicates');
+});

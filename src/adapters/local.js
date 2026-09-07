@@ -33,15 +33,58 @@ function findSkillFiles(root, depth = 0, out = []) {
   return out;
 }
 
+/**
+ * The Claude desktop app materialises the account's skills onto disk under
+ *   Application Support/Claude/local-agent-mode-sessions/skills-plugin/<id>/<id>/skills
+ * and gives every session its own pair of directories. Scanning all of them
+ * would report the same skill once per session and manufacture a duplicate
+ * pair for each, so only the most recently written session is used — that is
+ * the set of skills you currently have.
+ */
+function desktopAppSkillRoot() {
+  const base = path.join(HOME, 'Library', 'Application Support', 'Claude', 'local-agent-mode-sessions', 'skills-plugin');
+  if (!exists(base)) return null;
+
+  const readDirs = (dir) => {
+    try { return fs.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name); }
+    catch { return []; }
+  };
+
+  const sessions = [];
+  for (const outer of readDirs(base)) {
+    for (const inner of readDirs(path.join(base, outer))) {
+      const dir = path.join(base, outer, inner, 'skills');
+      if (!exists(dir)) continue;
+      let mtime = 0;
+      try { mtime = fs.statSync(dir).mtimeMs; } catch {}
+      sessions.push({ dir, mtime });
+    }
+  }
+  if (!sessions.length) return null;
+
+  sessions.sort((a, b) => b.mtime - a.mtime);
+  return {
+    dir: sessions[0].dir,
+    source: 'app',
+    label:
+      sessions.length > 1
+        ? `Claude app (most recent of ${sessions.length} sessions)`
+        : 'Claude app',
+  };
+}
+
 /** The places skills live, in the order we report them. */
 export function defaultSkillRoots(cwd = process.cwd()) {
-  return [
+  const roots = [
     { dir: path.join(HOME, '.claude', 'skills'), source: 'personal', label: '~/.claude/skills' },
     { dir: path.join(cwd, '.claude', 'skills'), source: 'project', label: '.claude/skills (this project)' },
     { dir: path.join(HOME, '.claude', 'plugins'), source: 'plugin', label: '~/.claude/plugins' },
     { dir: path.join(HOME, '.codex', 'skills'), source: 'codex', label: '~/.codex/skills' },
     { dir: path.join(HOME, '.config', 'codex', 'skills'), source: 'codex', label: '~/.config/codex/skills' },
   ];
+  const app = desktopAppSkillRoot();
+  if (app) roots.splice(1, 0, app);
+  return roots;
 }
 
 export function collectSkills({ cwd = process.cwd(), extraDirs = [] } = {}) {

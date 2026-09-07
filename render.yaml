@@ -1,0 +1,20 @@
+# Render blueprint — serves docs/ as a static site.
+#
+# The page is a single self-contained HTML file, so there is nothing to
+# build; Render still requires a buildCommand, hence the no-op.
+services:
+  - type: web
+    name: atlan-pulse
+    runtime: static
+    buildCommand: "echo 'no build step: docs/ is already static'"
+    staticPublishPath: ./docs
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
