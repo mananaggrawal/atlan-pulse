@@ -4,7 +4,7 @@
 # does not persist.
 services:
   - type: web
-    name: atlan-pulse
+    name: atlan-pulse-skill-health
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: starter
