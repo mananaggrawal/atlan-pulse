@@ -1,0 +1,16 @@
+name: ci
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      # Pulse audits Pulse. If our own skills stop scoring 100, this fails —
+      # a product that grades skill libraries cannot ship a sloppy one.
+      - run: npm run audit:self

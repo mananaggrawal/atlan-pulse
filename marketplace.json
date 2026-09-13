@@ -1,0 +1,12 @@
+{
+  "name": "atlan-pulse",
+  "owner": { "name": "Atlan Pulse" },
+  "plugins": [
+    {
+      "name": "atlan-pulse",
+      "source": "./plugin",
+      "description": "Audit your Claude skills: context cost, duplication, security, supply chain, authoring quality. Returns a scored PDF report and a shareable card.",
+      "version": "0.1.0"
+    }
+  ]
+}

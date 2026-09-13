@@ -1,0 +1,24 @@
+# Deploy as a Docker service, not a Node service: the PDF and the card are
+# printed by Chromium, which the Playwright base image already carries. A
+# plain Node runtime would have to download a browser at boot, on a disk that
+# does not persist.
+services:
+  - type: web
+    name: atlan-pulse
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    healthCheckPath: /health
+    disk:
+      name: pulse-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: PULSE_BASE_URL
+        sync: false          # set to the public HTTPS origin; card and report URLs are built from it
+      - key: PULSE_DATA_DIR
+        value: /data/runs
+      # PULSE_ALLOW_ANONYMOUS is deliberately absent. Local development sets it
+      # to 1; a deployed instance must require a token.

@@ -1,0 +1,8 @@
+{
+  "name": "atlan-pulse",
+  "version": "0.1.0",
+  "description": "Skill health for Claude. Audits your skills for context cost, duplication, security, supply-chain risk and authoring quality, then hands back a scored report and a shareable card.",
+  "author": { "name": "Atlan Pulse" },
+  "homepage": "https://skillhealth.dev",
+  "keywords": ["skills", "audit", "security", "tokens", "health"]
+}
