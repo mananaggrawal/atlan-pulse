@@ -64,6 +64,19 @@ Generate a report from real skill folders:
 node --experimental-strip-types scripts/demo-report.ts ~/.claude/skills out
 ```
 
+## Deploying
+
+`render.yaml` ships on the free tier by default: no card on file, no
+persistent disk. That means connection tokens, run history and published
+cards live on the container's local disk and are wiped on every restart or
+redeploy, and the instance cold-starts after 15 minutes idle. Fine for a demo;
+not fine for anything meant to keep working over days.
+
+To make it durable: add `plan: starter` and a `disk` block back to the web
+service in `render.yaml` (Render will ask for payment info on file — a
+temporary $1 authorization to verify the card, not a charge) and point
+`PULSE_DATA_DIR` at the mounted disk.
+
 ## Routes
 
 - `POST /api/mcp` — the MCP endpoint (`start_audit`, `submit_audit_findings`, `finish_audit`, prompt `audit`)
